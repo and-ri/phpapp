@@ -4,7 +4,8 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "twig/twig": "^3.9"
+        "twig/twig": "^3.9",
+        "rakibtg/sleekdb": "^2.15"
     },
     "config": {
         "vendor-dir": "core/vendor"

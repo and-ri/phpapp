@@ -9,6 +9,9 @@ class ControllerIndex extends Controller {
         $this->data['heading_title'] = 'Hello, World!';
 
         $this->data['header'] = $this->load->controller('common/header');
+
+        $this->data['welcome'] = $this->load->controller('common/welcome');
+
         $this->data['footer'] = $this->load->controller('common/footer');
 
         $this->page->render($this->view->template('index', $this->data));

@@ -25,4 +25,22 @@ class Load {
 
         return $output;
     }
+
+    public function model($route) {
+        $output = '';
+
+        $file = DIR_MODEL . str_replace(array('../', '..\\', '..'), '', $route) . '.php';
+        $class = 'Model' . preg_replace('/[^a-zA-Z0-9]/', '', $route);
+
+        if (is_file($file)) {
+            include_once($file);
+
+            $model = new $class($this->registry);
+
+            return $model;
+        } else {
+            trigger_error('Error: Could not load model ' . $route . '!');
+            exit();
+        }
+    }
 }

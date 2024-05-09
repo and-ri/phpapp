@@ -88,5 +88,5 @@ class Page {
         }
 
         echo html_entity_decode($html, ENT_QUOTES, 'UTF-8');
-    } 
+    }
 }
