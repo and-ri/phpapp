@@ -1,0 +1,16 @@
+<?php
+
+class ControllerIndex extends Controller {
+    public function index() {
+        $this->page->setTitle('Hello, World!');
+        $this->page->setDescription('This is a simple page.');
+        $this->page->setKeywords('hello, world');
+
+        $this->data['heading_title'] = 'Hello, World!';
+
+        $this->data['header'] = $this->load->controller('common/header');
+        $this->data['footer'] = $this->load->controller('common/footer');
+
+        $this->page->render($this->view->template('index', $this->data));
+    }
+}

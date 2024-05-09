@@ -1,0 +1,12 @@
+{
+    "name": "dotari/php-app",
+    "description": "Simple PHP Framework",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "twig/twig": "^3.9"
+    },
+    "config": {
+        "vendor-dir": "core/vendor"
+    }
+}
