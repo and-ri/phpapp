@@ -3,3 +3,4 @@ cache/twig
 core/vendor/*
 database/*
 !database/.gitkeep
+www/static/*
