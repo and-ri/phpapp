@@ -20,6 +20,8 @@ class ControllerCommonHeader extends Controller {
             }
         }
 
+        $this->data['menu'] = $this->load->controller('common/menu');
+
         $this->data['styles'][] = $this->staticfile->getUri('assets/bootstrap/css/bootstrap.min.css');
         $this->data['styles'][] = $this->staticfile->getUri('css/style.css');
 

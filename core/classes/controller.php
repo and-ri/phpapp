@@ -2,6 +2,7 @@
 
 class Controller {
     protected $registry;
+    protected $args;
 
     protected $input;
     protected $load;
@@ -9,13 +10,15 @@ class Controller {
     protected $view;
     protected $page;
     protected $staticfile;
+    protected $url;
 
     protected $model;
 
     protected $data = array();
 
-    public function __construct($registry) {
+    public function __construct($registry, $args = array()) {
         $this->registry = $registry;
+        $this->args = $args;
 
         $this->model = new stdClass();
         $this->input = $this->registry->get('input');
@@ -24,6 +27,7 @@ class Controller {
         $this->view = $this->registry->get('view');
         $this->page = $this->registry->get('page');
         $this->staticfile = $this->registry->get('staticfile');
+        $this->url = $this->registry->get('url');
 
         $this->data = $this->language->all();
     }

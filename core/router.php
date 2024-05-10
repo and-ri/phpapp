@@ -1,5 +1,25 @@
 <?php
+/*
+    FIXME:
+        - We need to parse routes and execute the controller.
+        /                   => index
+        /index              => index.php => index
+        /index              => index.php => index
+        /catalog            => catalog.php => index
+        /catalog/index      => catalog.php => index
+        /catalog/components => (
+            try catalog.php => components
+            try catalog/components.php => index
+        )
+        /catalog/components/index => catalog/components.php => index
+        /catalog/components/other => (
+            try catalog/components.php => other
+            try catalog/components/other.php => index
+        )
 
+        ...
+
+*/
 class Router {
     private $registry;
     private $path;
@@ -19,59 +39,47 @@ class Router {
     }
 
     private function getController() {
-        $route = (empty($_GET['rt'])) ? '' : $_GET['rt'];
-        
-        if (empty($route)) {
-            $route = 'index';
-        } else {
-            $parts = explode('/', $route);
-            $this->controller = $parts[0];
+        $request = html_entity_decode($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
 
-            if (isset($parts[1])) {
-                $this->controller .= '/' . $parts[1];
-            }
+        $route = empty($request) ? '' : $request;
 
-            if (isset($parts[2])) {
-                $this->action = $parts[1];
-            }
-        }
-        
-        if (empty($this->controller)) {
-            $this->controller = 'index';
-        }
-        
-        if (empty($this->action)) {
-            $this->action = 'index';
-        }
-        
-        $this->file = DIR_CONTROLLER . $this->controller . '.php';
+        $route_parts = array_values(array_filter(explode('/', $route)));
+
+        $this->file = implode('/', $route_parts);
+        $this->controller = $route_parts;
     }
 
     private function executeController() {
-        if (is_readable($this->file) == false) {
-            $this->file = DIR_CONTROLLER . 'error/controller.php';
-            $this->controller = 'ErrorController';
+        if (!file_exists(DIR_CONTROLLER . $this->file . '.php')) {
+            $this->file = 'error/not_found';
+            $this->controller = array('ErrorNotFound');
         }
-        
-        require_once $this->file;
-
-        $class_parts = explode('/', $this->controller);
-
+    
+        require_once DIR_CONTROLLER . $this->file . '.php';
+    
         $class_string = '';
-
+        $class_parts = explode('/', $this->file);
+        
         foreach ($class_parts as $part) {
             $class_string .= ucfirst($part);
         }
+
+        $class_string = str_replace(' ', '', ucwords(str_replace('_', ' ', $class_string)));
+
+        $this->args = array(
+            'controller' => $this->controller,
+            'action' => $this->action
+        );
         
         $class = 'Controller' . ucfirst($class_string);
-        $controller = new $class($this->registry);
+        $controller = new $class($this->registry, $this->args);
         
         if (is_callable(array($controller, $this->action)) == false) {
-            $action = 'index';
-        } else {
-            $action = $this->action;
+            $this->action = 'index';
         }
         
+        $action = $this->action;
         $controller->$action();
     }
+    
 }

@@ -12,6 +12,8 @@ class View {
         $this->twig = new \Twig\Environment($loader, [
             'cache' => DIR_CACHE . 'twig',
             'auto_reload' => true,
+            'debug' => true,
+            'autoescape' => false
         ]);
     }
 
