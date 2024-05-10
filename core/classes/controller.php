@@ -8,6 +8,7 @@ class Controller {
     protected $language;
     protected $view;
     protected $page;
+    protected $staticfile;
 
     protected $model;
 
@@ -22,6 +23,7 @@ class Controller {
         $this->language = $this->registry->get('language');
         $this->view = $this->registry->get('view');
         $this->page = $this->registry->get('page');
+        $this->staticfile = $this->registry->get('staticfile');
 
         $this->data = $this->language->all();
     }

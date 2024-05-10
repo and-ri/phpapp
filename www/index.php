@@ -1,5 +1,8 @@
 <?php
 
+$domain = '';
+$https = false;
+
 define('DIR_ROOT', realpath(__DIR__ . '/../'));
 define('DIR_APP', DIR_ROOT . '/app/');
 define('DIR_CACHE', DIR_ROOT . '/cache/');
@@ -15,5 +18,9 @@ define('DIR_VIEW', DIR_APP . 'view/');
 define('DIR_LANGUAGE', DIR_APP . 'language/');
 
 define('DEFAULT_LANGUAGE', 'en');
+
+define('URL_WEBSITE', ($https ? 'https://' : 'http://') . ($domain ? $domain : $_SERVER['HTTP_HOST']) . '/');
+
+define('URL_STATIC', URL_WEBSITE . 'static/');
 
 require_once DIR_CORE . 'bootstrap.php';

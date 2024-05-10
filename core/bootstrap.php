@@ -11,6 +11,7 @@ $registry->set('load', new Load($registry));
 $registry->set('language', new Language(DEFAULT_LANGUAGE));
 $registry->set('page', new Page());
 $registry->set('database', new Database());
+$registry->set('staticfile', new StaticFile());
 
 $registry->set('view', new View($registry));
 

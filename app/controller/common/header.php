@@ -9,7 +9,19 @@ class ControllerCommonHeader extends Controller {
         $this->data['canonical'] = $this->page->getCanonical();
         $this->data['links'] = $this->page->getLinks();
         $this->data['styles'] = $this->page->getStyles();
-        $this->data['scripts'] = $this->page->getScripts();
+        
+        $scripts = $this->page->getScripts();
+
+        $this->data['scripts'] = array();
+
+        foreach ($scripts as $script) {
+            if ($script['position'] == 'header') {
+                $this->data['scripts'][] = $script['src'];
+            }
+        }
+
+        $this->data['styles'][] = $this->staticfile->getUri('assets/bootstrap/css/bootstrap.min.css');
+        $this->data['styles'][] = $this->staticfile->getUri('css/style.css');
 
         return $this->view->template('common/header', $this->data);
     }

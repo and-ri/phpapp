@@ -2,11 +2,11 @@
 
 class ControllerIndex extends Controller {
     public function index() {
-        $this->page->setTitle('Hello, World!');
+        $this->page->setTitle('PHPapp :: MVC Framework');
         $this->page->setDescription('This is a simple page.');
         $this->page->setKeywords('hello, world');
 
-        $this->data['heading_title'] = 'Hello, World!';
+        $this->data['heading_title'] = 'PHPapp';
 
         $this->data['header'] = $this->load->controller('common/header');
 

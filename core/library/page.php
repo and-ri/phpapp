@@ -42,8 +42,11 @@ class Page {
         $this->styles[] = $href;
     }
 
-    public function addScript($src) {
-        $this->scripts[] = $src;
+    public function addScript($src, $position = 'header') {
+        $this->scripts[] = array(
+            'src' => $src,
+            'position' => $position,
+        );
     }
 
     public function addHeader($header) {
