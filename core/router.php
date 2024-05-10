@@ -54,18 +54,28 @@ class Router {
 
         // Set default controller and action
         $this->file = 'index';
-        $this->controller = 'IndexController';
+        $this->controller = 'ControllerIndex';
         $this->action = 'index';
 
-        if (!empty($route_parts)) {
-            // Set controller based on the first part of the route
-            $this->file = $route_parts[0];
-            $this->controller = ucfirst($route_parts[0]) . 'Controller';
+        // Parse the route parts
+        foreach ($route_parts as $key => $part) {
+            $path = implode('/', array_slice($route_parts, 0, $key + 1));
+            $controller_file = DIR_CONTROLLER . $path . '.php';
 
-            // Check if there's an action specified
-            if (isset($route_parts[1])) {
-                $this->action = $route_parts[1];
+            if (file_exists($controller_file)) {
+                $this->file = $path;
+                $this->controller = 'Controller' . ucfirst(str_replace('/', '', $path));
+
+                // Check if there's an action specified
+                if (isset($route_parts[$key + 1])) {
+                    $this->action = $route_parts[$key + 1];
+                }
             }
+        }
+
+        // Set args for not_found
+        if ($this->file == 'error/not_found') {
+            $this->args['error_message'] = 'Controller or action not found';
         }
     }
 
@@ -76,6 +86,7 @@ class Router {
         if (!file_exists($controller_file)) {
             $this->file = 'error/not_found';
             $this->controller = 'ErrorNotFoundController';
+            $this->args['error_message'] = 'Controller file not found';
         }
 
         // Include the controller file
@@ -87,6 +98,7 @@ class Router {
         // Check if the action method exists
         if (!method_exists($controller, $this->action)) {
             $this->action = 'index';
+            $this->args['error_message'] = 'Action not found';
         }
 
         // Call the action method

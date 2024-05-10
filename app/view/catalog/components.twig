@@ -1,0 +1,162 @@
+{{ header }}
+<div class="container" id="content">
+    <h1>Components</h1>
+    <p>
+        This is the components page.
+    </p>
+
+    <h2>Libraries</h2>
+    <div class="vstack ps-3">
+        <div>
+            <h3>Database</h3>
+            <div class="ps-3">
+                <p>The <code>Database</code> class is a PHP class that provides functionality for managing a database using the SleekDB library. It allows for easy creation and management of database tables, as well as provides configuration options for caching, timeouts, and search algorithms.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>protected $database_dir</code>: The directory path where the database files are stored.</li>
+                    <li><code>protected $configuration</code>: An array containing configuration options for the database.</li>
+                    <li><code>public $tables</code>: An object containing references to the database tables.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>__construct()</code>: The constructor method initializes the database configuration and creates instances of SleekDB stores for each table defined in the configuration file.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>Input</h3>
+            <div class="ps-3">
+                <p>The <code>Input</code> class is a PHP class that provides methods for sanitizing and accessing input data from various sources, such as GET, POST, FILES, SERVER, and COOKIE arrays.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>public $get</code>: An array containing sanitized GET data.</li>
+                    <li><code>public $post</code>: An array containing sanitized POST data.</li>
+                    <li><code>public $files</code>: An array containing raw FILES data.</li>
+                    <li><code>public $server</code>: An array containing sanitized SERVER data.</li>
+                    <li><code>public $cookie</code>: An array containing sanitized COOKIE data.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>__construct()</code>: The constructor method calls the <code>setGet()</code>, <code>setPost()</code>, <code>setFiles()</code>, <code>setServer()</code>, and <code>setCookie()</code> methods to sanitize and populate the class properties.</li>
+                    <li><code>setGet()</code>: Sanitizes and sets the <code>$get</code> property with sanitized GET data.</li>
+                    <li><code>setPost()</code>: Sanitizes and sets the <code>$post</code> property with sanitized POST data.</li>
+                    <li><code>setFiles()</code>: Sets the <code>$files</code> property with raw FILES data.</li>
+                    <li><code>setServer()</code>: Sanitizes and sets the <code>$server</code> property with sanitized SERVER data.</li>
+                    <li><code>setCookie()</code>: Sanitizes and sets the <code>$cookie</code> property with sanitized COOKIE data.</li>
+                    <li><code>sanitize($data)</code>: Recursively sanitizes input data. If <code>$data</code> is an array, it iterates over its elements and sanitizes them. If <code>$data</code> is a string, it sanitizes it using <code>htmlspecialchars()</code>.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>Language</h3>
+            <div class="ps-3">
+                <p>The <code>Language</code> class is a PHP class that provides functionality for loading and accessing language files for internationalization purposes.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>private $lang</code>: A string representing the current language code.</li>
+                    <li><code>private $data</code>: An array containing the loaded language data.</li>
+                </ul>
+                <p><strong>Constructor:</strong></p>
+                <ul>
+                    <li><code>__construct($lang)</code>: Initializes the <code>$lang</code> property with the provided language code and loads the default language file.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>get($key)</code>: Retrieves a language string from the loaded data. If the key is not found, it returns the key itself.</li>
+                    <li><code>load($file)</code>: Loads a language file and merges its contents into the <code>$data</code> property. If the file does not exist, it triggers an error.</li>
+                    <li><code>all()</code>: Returns all loaded language data.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>Load</h3>
+            <div class="ps-3">
+                <p>The <code>Load</code> class is a PHP class that provides functionality for dynamically loading controllers and models in a web application.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>protected $registry</code>: An object representing the application registry.</li>
+                </ul>
+                <p><strong>Constructor:</strong></p>
+                <ul>
+                    <li><code>__construct($registry)</code>: Initializes the <code>$registry</code> property with the provided registry object.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>controller($route, $data = array())</code>: Loads and executes a controller class based on the specified route. It returns the output of the controller's index method.</li>
+                    <li><code>model($route)</code>: Loads a model class based on the specified route. It returns an instance of the model class.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>Page</h3>
+            <div class="ps-3">
+                <p>The <code>Page</code> class is a PHP class that represents a web page and provides methods for managing its metadata, links, styles, and scripts.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>protected $title</code>: The title of the page.</li>
+                    <li><code>protected $description</code>: The description of the page.</li>
+                    <li><code>protected $keywords</code>: The keywords associated with the page.</li>
+                    <li><code>protected $robots</code>: The robots meta tag value for the page.</li>
+                    <li><code>protected $canonical</code>: The canonical URL of the page.</li>
+                    <li><code>protected $links</code>: An array of link elements for the page.</li>
+                    <li><code>protected $styles</code>: An array of style URLs for the page.</li>
+                    <li><code>protected $scripts</code>: An array of script elements for the page.</li>
+                    <li><code>protected $headers</code>: An array of additional HTTP headers for the page.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>setTitle($title)</code>: Sets the title of the page.</li>
+                    <li><code>setDescription($description)</code>: Sets the description of the page.</li>
+                    <li><code>setKeywords($keywords)</code>: Sets the keywords for the page.</li>
+                    <li><code>setRobots($robots)</code>: Sets the robots meta tag value for the page.</li>
+                    <li><code>setCanonical($canonical)</code>: Sets the canonical URL for the page.</li>
+                    <li><code>addLink($href, $rel)</code>: Adds a link element to the page.</li>
+                    <li><code>addStyle($href)</code>: Adds a style URL to the page.</li>
+                    <li><code>addScript($src, $position = 'header')</code>: Adds a script element to the page, specifying its position (header or footer).</li>
+                    <li><code>addHeader($header)</code>: Adds an additional HTTP header to the page.</li>
+                    <li><code>getTitle()</code>: Gets the title of the page.</li>
+                    <li><code>getDescription()</code>: Gets the description of the page.</li>
+                    <li><code>getKeywords()</code>: Gets the keywords of the page.</li>
+                    <li><code>getRobots()</code>: Gets the robots meta tag value of the page.</li>
+                    <li><code>getCanonical()</code>: Gets the canonical URL of the page.</li>
+                    <li><code>getLinks()</code>: Gets the link elements of the page.</li>
+                    <li><code>getStyles()</code>: Gets the style URLs of the page.</li>
+                    <li><code>getScripts()</code>: Gets the script elements of the page.</li>
+                    <li><code>render($html)</code>: Renders the page by outputting the HTML content with the added HTTP headers.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>StaticFile</h3>
+            <div class="ps-3">
+                <p>The <code>StaticFile</code> class is a PHP class that provides functionality for managing static files, such as CSS and JavaScript files, and serving them to clients.</p>
+                <p><strong>Properties:</strong></p>
+                <ul>
+                    <li><code>protected $static_dir</code>: The directory path where the static files are stored.</li>
+                    <li><code>protected $static_www_dir</code>: The directory path accessible via the web server for serving static files.</li>
+                </ul>
+                <p><strong>Constructor:</strong></p>
+                <ul>
+                    <li>The constructor method creates the necessary directories for storing static files if they do not already exist.</li>
+                </ul>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>getFile($file)</code>: Retrieves the content of a static file.</li>
+                    <li><code>getUri($file)</code>: Returns the URI of a static file, ensuring it is up to date by copying it from the storage directory to the web-accessible directory if necessary.</li>
+                    <li><code>saveFile($file)</code>: Saves a static file to the web-accessible directory if it is newer than the existing file or if the file does not exist in the web-accessible directory.</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h3>Url</h3>
+            <div class="ps-3">
+                <p>The <code>Url</code> class is a PHP class that provides a method for generating URLs with query parameters based on a given route and arguments.</p>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li><code>link($route, $args = array())</code>: Generates a URL by appending the route to the base website URL and adding query parameters if provided.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}
