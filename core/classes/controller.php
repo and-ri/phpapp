@@ -4,7 +4,7 @@ class Controller {
     protected $registry;
     protected $args;
 
-    protected $input;
+    protected $request;
     protected $load;
     protected $language;
     protected $view;
@@ -21,7 +21,7 @@ class Controller {
         $this->args = $args;
 
         $this->model = new stdClass();
-        $this->input = $this->registry->get('input');
+        $this->request = $this->registry->get('request');
         $this->load = $this->registry->get('load');
         $this->language = $this->registry->get('language');
         $this->view = $this->registry->get('view');

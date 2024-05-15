@@ -4,3 +4,4 @@ core/vendor/*
 database/*
 !database/.gitkeep
 www/static/*
+*.pid

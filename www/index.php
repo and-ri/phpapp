@@ -23,4 +23,6 @@ define('URL_WEBSITE', ($https ? 'https://' : 'http://') . ($domain ? $domain : $
 
 define('URL_STATIC', URL_WEBSITE . 'static/');
 
+define('SESSION_NAME', 'PHPAPPSESSID');
+
 require_once DIR_CORE . 'bootstrap.php';

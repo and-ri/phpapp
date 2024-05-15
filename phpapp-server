@@ -1,0 +1,13 @@
+#!/usr/bin/env -S pkgx +php.net@8 bash -eo pipefail
+
+set -e
+
+IP=127.0.0.1
+PORT=8080
+
+# Start the server
+php -S $IP:$PORT -t ./www &
+
+SERVER_PID=$!
+
+echo $SERVER_PID > server.pid

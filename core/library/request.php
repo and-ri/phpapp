@@ -1,6 +1,6 @@
 <?php
 
-class Input {
+class Request {
     public $get;
     public $post;
     public $files;
