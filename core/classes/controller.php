@@ -11,16 +11,20 @@ class Controller {
     protected $page;
     protected $staticfile;
     protected $url;
+    protected $session;
+    protected $user;
 
     protected $model;
 
     protected $data = array();
+    protected $use = array();
 
     public function __construct($registry, $args = array()) {
         $this->registry = $registry;
         $this->args = $args;
 
         $this->model = new stdClass();
+
         $this->request = $this->registry->get('request');
         $this->load = $this->registry->get('load');
         $this->language = $this->registry->get('language');
@@ -28,11 +32,13 @@ class Controller {
         $this->page = $this->registry->get('page');
         $this->staticfile = $this->registry->get('staticfile');
         $this->url = $this->registry->get('url');
+        $this->session = $this->registry->get('session');
+        $this->user = $this->registry->get('user');
 
         $this->data = $this->language->all();
     }
 
-    protected function loadModel($model) {
+    protected function useModel($model) {
         $model_parts = explode('/', str_replace('../', '', (string)$model));
         
         switch (count($model_parts)) {
@@ -58,5 +64,11 @@ class Controller {
                 trigger_error('Error: Could not load model ' . $model . '!');
                 exit();
         }
+    }
+
+    protected function useLanguage($language) {
+        $this->language->load($language);
+
+        $this->data = array_merge($this->data, $this->language->all());
     }
 }

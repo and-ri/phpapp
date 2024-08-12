@@ -8,6 +8,6 @@ class Model {
     public function __construct($registry) {
         $this->registry = $registry;
 
-        $this->database = $this->registry->get('database');
+        $this->db = $this->registry->get('db');
     }
 }
