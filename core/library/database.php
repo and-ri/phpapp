@@ -31,5 +31,9 @@ class Database {
         foreach ($tables as $table) {
             $this->tables->{$table} = new Store($table, $this->database_dir, $this->configuration);
         }
-    }    
+    }
+
+    public function insert($table, $data) {
+        return $this->tables->{$table}->insert($data);
+    }
 }
