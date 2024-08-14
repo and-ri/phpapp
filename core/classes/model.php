@@ -3,7 +3,7 @@
 class Model {
     protected $registry;
 
-    protected $database;
+    protected $db;
     
     public function __construct($registry) {
         $this->registry = $registry;
