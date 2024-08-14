@@ -8,6 +8,9 @@ class ControllerErrorNotFound extends Controller {
 
         $this->data['heading_title'] = 'Error 404';
 
+        $this->page->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
+        $this->page->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
+
         $this->data['header'] = $this->load->controller('common/header');
 
         $this->data['footer'] = $this->load->controller('common/footer');
