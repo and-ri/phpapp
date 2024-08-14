@@ -10,12 +10,11 @@ class ControllerErrorNotFound extends Controller {
 
         $this->data['header'] = $this->load->controller('common/header');
 
-        $this->data['welcome'] = $this->load->controller('common/welcome');
-
         $this->data['footer'] = $this->load->controller('common/footer');
 
-        $this->data['controller'] = $this->args['controller'];
-        $this->data['action'] = $this->args['action'];
+        $this->data['controller'] = isset($this->args['controller']) ? $this->args['controller'] : '';
+        $this->data['action'] = isset($this->args['action']) ? $this->args['action'] : '';
+        $this->data['message'] = isset($this->args['message']) ? $this->args['message'] : '';
 
         $this->page->addHeader('HTTP/1.1 404 Not Found');
         $this->page->render($this->view->template('error/not_found', $this->data));
