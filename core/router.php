@@ -85,6 +85,8 @@ class Router {
 
             // Check if the controller class exists
             if (!class_exists($this->controller)) {
+                require_once DIR_CONTROLLER . 'error/not_found.php';
+
                 $this->args['controller'] = $this->file;
                 $this->args['action'] = $this->action;
                 $this->args['message'] = 'Controller class not found';
