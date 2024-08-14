@@ -2,7 +2,7 @@
 
 class ControllerCommonWelcome extends Controller {
     public function index() {
-        $this->loadModel('user/user');
+        $this->useModel('user/user');
 
         $this->data['cover'] = $this->staticfile->getUri('img/welcome.png');
 
