@@ -92,4 +92,14 @@ class Page {
 
         echo html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     }
+
+    public function responseJson($data, $pretty = false) {
+        $this->addHeader('Content-Type: application/json');
+
+        foreach ($this->headers as $header) {
+            header($header);
+        }
+
+        echo json_encode($data, $pretty ? JSON_PRETTY_PRINT : 0);
+    }
 }
