@@ -6,3 +6,4 @@ database/*
 www/static/*
 *.pid
 .env
+data/session/*

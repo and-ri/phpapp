@@ -104,6 +104,7 @@ class Router {
             $this->args['action'] = $this->action;
             $this->args['message'] = 'Action method not found';
             $this->file = 'error/not_found';
+            require_once DIR_CONTROLLER . 'error/not_found.php';
             $this->controller = 'ControllerErrorNotFound';
             $controller = new $this->controller($this->registry, $this->args);
             $this->action = 'index';
