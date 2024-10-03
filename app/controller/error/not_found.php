@@ -8,14 +8,16 @@ class ControllerErrorNotFound extends Controller {
 
         $this->data['heading_title'] = 'Error 404';
 
-        $this->data['header'] = $this->load->controller('common/header');
+        $this->page->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
+        $this->page->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
 
-        $this->data['welcome'] = $this->load->controller('common/welcome');
+        $this->data['header'] = $this->load->controller('common/header');
 
         $this->data['footer'] = $this->load->controller('common/footer');
 
-        $this->data['controller'] = $this->args['controller'];
-        $this->data['action'] = $this->args['action'];
+        $this->data['controller'] = isset($this->args['controller']) ? $this->args['controller'] : '';
+        $this->data['action'] = isset($this->args['action']) ? $this->args['action'] : '';
+        $this->data['message'] = isset($this->args['message']) ? $this->args['message'] : '';
 
         $this->page->addHeader('HTTP/1.1 404 Not Found');
         $this->page->render($this->view->template('error/not_found', $this->data));

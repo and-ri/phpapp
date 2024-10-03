@@ -2,8 +2,13 @@
 <section class="py-5">
     <div class="container">
         <h1>{{ heading_title }}</h1>
-        <p>{{ controller }}</p>
-        <p>{{ action }}</p>
+        <pre><code class="language-json">
+{
+    "controller": "{{ controller }}",
+    "action": "{{ action }}"
+    "message": "{{ message }}"
+}
+        </code></pre>
     </div>
 </section>
 {{ footer }}

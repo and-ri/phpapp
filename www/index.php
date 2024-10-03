@@ -11,7 +11,9 @@ define('DIR_CORE', DIR_ROOT . '/core/');
 define('DIR_DATABASE', DIR_ROOT . '/database/');
 define('DIR_STATIC', DIR_ROOT . '/static/');
 define('DIR_WWW', DIR_ROOT . '/www/');
+define('DIR_DATA', DIR_ROOT . '/data/');
 
+define('DIR_SESSION', DIR_DATA . 'session/');
 define('DIR_CONTROLLER', DIR_APP . 'controller/');
 define('DIR_MODEL', DIR_APP . 'model/');
 define('DIR_VIEW', DIR_APP . 'view/');
