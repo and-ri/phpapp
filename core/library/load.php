@@ -7,6 +7,14 @@ class Load {
         $this->registry = $registry;
     }
 
+    public function __get($key) {
+        return $this->registry->get($key);
+    }
+
+    public function __set($name, $value) {
+        $this->registry->set($name, $value);
+    }
+
     public function controller($route, $data = array()) {
         $output = '';
 
@@ -27,8 +35,6 @@ class Load {
     }
 
     public function model($route) {
-        $output = '';
-
         $file = DIR_MODEL . str_replace(array('../', '..\\', '..'), '', $route) . '.php';
         $class = 'Model' . preg_replace('/[^a-zA-Z0-9]/', '', $route);
 
