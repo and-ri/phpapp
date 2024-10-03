@@ -1,13 +1,27 @@
 <?php
 
 class Db {
+    private $registry;
     private $adaptor;
 
-    public function __construct() {
-        require_once DIR_CONFIG . 'database.php';
+    public function __construct($registry) {
+        $this->registry = $registry;
         
-        $this->adaptor = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+        require_once DIR_CONFIG . 'database.php';
+
+        $DB_HOST = DB_HOST ? DB_HOST : $this->env->get('DB_HOST');
+        $DB_USER = DB_USER ? DB_USER : $this->env->get('DB_USER');
+        $DB_PASS = DB_PASS ? DB_PASS : $this->env->get('DB_PASS');
+        $DB_NAME = DB_NAME ? DB_NAME : $this->env->get('DB_NAME');
+        $DB_PORT = DB_PORT ? DB_PORT : $this->env->get('DB_PORT');
+        
+        $this->adaptor = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_PORT);
     }
+
+    public function __get($key) {
+        return $this->registry->get($key);
+    }
+    
     public function query($sql, $rows = false) {
         $result = $this->adaptor->query($sql);
         if ($result instanceof mysqli_result) {
@@ -29,5 +43,14 @@ class Db {
     public function last() {
         $last = $this->adaptor->insert_id;
         return $last;
+    }
+
+    public function count() {
+        $count = $this->adaptor->affected_rows;
+        return $count;
+    }
+
+    public function __destruct() {
+        $this->adaptor->close();
     }
 }

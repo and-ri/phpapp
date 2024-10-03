@@ -5,3 +5,4 @@ database/*
 !database/.gitkeep
 www/static/*
 *.pid
+.env

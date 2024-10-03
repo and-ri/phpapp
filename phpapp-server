@@ -1,4 +1,4 @@
-#!/usr/bin/env -S pkgx +php.net@8 bash -eo pipefail
+#!/usr/bin/env sh -eo pipefail
 
 set -e
 
