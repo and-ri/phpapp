@@ -5,9 +5,37 @@ set -e
 IP=127.0.0.1
 PORT=8080
 
-# Start the server
-php -S $IP:$PORT -t ./www &
+function stop_server {
+  if [ -f server.pid ]; then
+    kill $(cat server.pid)
+    rm server.pid
+  fi
+}
 
-SERVER_PID=$!
+function start_server {
+  php -S $IP:$PORT -t ./www &
+  echo $! > server.pid
+}
 
-echo $SERVER_PID > server.pid
+function status_server {
+  if [ -f server.pid ]; then
+    echo "Server is running"
+  else
+    echo "Server is not running"
+  fi
+}
+
+case $1 in
+  --start)
+    start_server
+    ;;
+  --stop)
+    stop_server
+    ;;
+  --status)
+    status_server
+    ;;
+  *)
+    echo "Invalid command"
+    ;;
+esac
