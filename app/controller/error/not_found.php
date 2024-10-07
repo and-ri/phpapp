@@ -2,11 +2,13 @@
 
 class ControllerErrorNotFound extends Controller {
     public function index() {
-        $this->response->setTitle('PHPapp :: 404');
-        $this->response->setDescription('This is a simple 404 page.');
-        $this->response->setKeywords('hello, world');
+        $this->app->useLanguage('error/not_found');
 
-        $this->data['heading_title'] = 'Error 404';
+        $this->response->setTitle($this->language->get('meta_title'));
+        $this->response->setDescription($this->language->get('meta_description'));
+        $this->response->setKeywords($this->language->get('meta_keywords'));
+
+        $this->data['heading_title'] = $this->language->get('heading_title');
 
         $this->response->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
         $this->response->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
