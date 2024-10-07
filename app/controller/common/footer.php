@@ -2,7 +2,9 @@
 
 class ControllerCommonFooter extends Controller {
     public function index() {
-        $scripts = $this->page->getScripts();
+        $this->response->addScript('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', 'footer');
+
+        $scripts = $this->response->getScripts();
 
         $this->data['scripts'] = array();
 
@@ -11,8 +13,6 @@ class ControllerCommonFooter extends Controller {
                 $this->data['scripts'][] = $script['src'];
             }
         }
-
-        $this->data['scripts'][] = $this->staticfile->getUri('assets/bootstrap/js/bootstrap.bundle.min.js');
 
         return $this->view->template('common/footer', $this->data);
     }

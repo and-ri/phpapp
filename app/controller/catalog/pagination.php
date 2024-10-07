@@ -7,9 +7,9 @@ class ControllerCatalogPagination extends Controller {
         
         $this->data = $this->language->all();
 
-        $this->page->setTitle($this->language->get('meta_title'));
-        $this->page->setDescription($this->language->get('meta_description'));
-        $this->page->setKeywords($this->language->get('meta_keywords'));
+        $this->response->setTitle($this->language->get('meta_title'));
+        $this->response->setDescription($this->language->get('meta_description'));
+        $this->response->setKeywords($this->language->get('meta_keywords'));
 
         $page = isset($this->request->get['page']) ? $this->request->get['page'] : 1;
 
@@ -33,6 +33,6 @@ class ControllerCatalogPagination extends Controller {
         $this->data['header'] = $this->load->controller('common/header');
         $this->data['footer'] = $this->load->controller('common/footer');
 
-        $this->page->render($this->view->template('catalog/pagination', $this->data));
+        $this->response->html($this->view->template('catalog/pagination', $this->data));
     }
 }

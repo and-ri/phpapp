@@ -11,7 +11,7 @@ $registry->set('request', new Request());
 $registry->set('load', new Load($registry));
 $registry->set('language', new Language(DEFAULT_LANGUAGE));
 $registry->set('app', new App($registry));
-$registry->set('page', new Page());
+$registry->set('response', new Response());
 $registry->set('db', new Db($registry));
 $registry->set('staticfile', new StaticFile());
 $registry->set('url', new Url());

@@ -1,6 +1,6 @@
 <?php
 
-class Page {
+class Response {
     protected $title;
     protected $description;
     protected $keywords;
@@ -85,7 +85,9 @@ class Page {
         return $this->scripts;
     }
 
-    public function render($html) {
+    public function html($html) {
+        $this->addHeader('Content-Type: text/html; charset=utf-8');
+
         foreach ($this->headers as $header) {
             header($header);
         }
@@ -93,7 +95,7 @@ class Page {
         echo html_entity_decode($html, ENT_QUOTES, 'UTF-8');
     }
 
-    public function responseJson($data, $pretty = false) {
+    public function json($data, $pretty = false) {
         $this->addHeader('Content-Type: application/json');
 
         foreach ($this->headers as $header) {
