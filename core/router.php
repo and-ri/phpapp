@@ -22,6 +22,11 @@ class Router {
         // Get the request URI
         $request = html_entity_decode($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
 
+        // Remove query string from the request URI
+        if (strpos($request, '?') !== false) {
+            $request = substr($request, 0, strpos($request, '?'));
+        }
+
         // Split the URI into parts
         $route_parts = array_values(array_filter(explode('/', $request)));
 

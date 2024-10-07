@@ -16,7 +16,7 @@ $registry->set('db', new Db($registry));
 $registry->set('staticfile', new StaticFile());
 $registry->set('url', new Url());
 $registry->set('session', new Session($registry));
-$registry->set('user', new User($registry));
+$registry->set('pagination', new Pagination());
 
 $registry->set('view', new View($registry));
 

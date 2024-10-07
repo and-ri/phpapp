@@ -3,11 +3,14 @@
 class Db {
     private $registry;
     private $adaptor;
+    public $prefix;
 
     public function __construct($registry) {
         $this->registry = $registry;
         
         require_once DIR_CONFIG . 'database.php';
+
+        $this->prefix = DB_PREFIX ? DB_PREFIX : $this->env->get('DB_PREFIX');
 
         $DB_HOST = DB_HOST ? DB_HOST : $this->env->get('DB_HOST');
         $DB_USER = DB_USER ? DB_USER : $this->env->get('DB_USER');

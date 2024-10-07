@@ -1,0 +1,29 @@
+{{ header }}
+<div class="container" id="content">
+    <h1>{{ heading_title }}</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <td colspan="3">{{ total }}( {{ from }} - {{ to }} )</td>
+                </tr>
+                <tr>
+                    <td class="text-center">{{ column_post_id }}</td>
+                    <td class="text-left">{{ column_hash }}</td>
+                    <td class="text-left">{{ column_created_at }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td class="text-center">{{ post.post_id }}</td>
+                    <td class="text-left">{{ post.hash }}</td>
+                    <td class="text-left">{{ post.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ pagination }}
+</div>
+{{ footer }}
