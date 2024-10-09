@@ -2,6 +2,11 @@
 
 **PHPapp** is a lightweight PHP framework designed for quick and efficient web application development. It follows the MVC (Model-View-Controller) architecture and provides core components for database interaction, session management, request handling, and more.
 
+> [@and-ri](https://github.com/and-ri):
+> Hello everyone! I am very excited to share with you a version of my PHP framework. Maybe it is far from such giants as Laravel or Yii, but it has become very convenient for me. Especially for quick deployment of small web applications or prototypes.
+> 
+> I will be happy for any contribution :)
+
 ## Features
 
 - **MVC Architecture:** Clean separation of concerns with models, views, and controllers to organize code logically.
