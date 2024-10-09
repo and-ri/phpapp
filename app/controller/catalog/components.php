@@ -3,6 +3,7 @@
 class ControllerCatalogComponents extends Controller {
     public function index() {
         $this->app->useLanguage('catalog/components');
+        $this->data = $this->language->all();
 
         $this->response->setTitle($this->language->get('meta_title'));
         $this->response->setDescription($this->language->get('meta_description'));
@@ -10,8 +11,6 @@ class ControllerCatalogComponents extends Controller {
 
         $this->response->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
         $this->response->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
-
-        $this->data['heading_title'] = $this->language->get('heading_title');
 
         $libraries = scandir(DIR_CORE . 'library');
 

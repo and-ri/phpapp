@@ -19,6 +19,10 @@ class ControllerCommonMenu extends Controller {
                 'title' => $this->language->get('text_pagination'),
                 'href' => $this->url->link('catalog/pagination')
             ),
+            array(
+                'title' => $this->language->get('text_csrf_protection'),
+                'href' => $this->url->link('catalog/csrf_protection')
+            )
         );
 
         return $this->view->template('common/menu', $this->data);

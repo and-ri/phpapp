@@ -40,6 +40,10 @@ class Session {
         ]);
 
         setcookie(SESSION_NAME, session_id(), 0, '/');
+
+        if (!$this->has('token')) {
+            $this->refreshToken();
+        }
     }
 
     public function destroy() {
@@ -70,6 +74,14 @@ class Session {
         if ($this->has($key)) {
             unset($_SESSION[$key]);
         }
+    }
+
+    public function refreshToken() {
+        $this->set('token', md5(uniqid(mt_rand(), true)));
+    }
+
+    public function validateToken($token) {
+        return $this->has('token') && $this->get('token') && $this->get('token') == $token;
     }
 
     public function __destruct() {

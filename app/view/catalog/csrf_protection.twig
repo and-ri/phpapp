@@ -1,0 +1,30 @@
+{{ header }}
+<div class="container my-5">
+    <h1>{{ heading_title }}</h1>
+    <p>{{ text_help }}</p>
+    <form action="{{ action }}" method="post" enctype="multipart/form-data">
+        {{ csrf }}
+        <fieldset>
+            <legend>{{ text_form }}</legend>
+            <div class="form-floating mb-3">
+                <input type="email" name="email" value="{{ email }}" placeholder="{{ entry_email }}" class="form-control" required id="entry-email">
+                <label for="entry-email">{{ entry_email }}</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" class="form-control" required id="entry-password">
+                <label for="entry-password">{{ entry_password }}</label>
+            </div>
+            <div class="hstack gap-3">
+                <button type="submit" class="btn btn-warning btn-lg">{{ button_submit }}</button>
+                {% if error %}
+                <strong class="text-danger">{{ error }}</strong>
+                {% endif %}
+                {% if success %}
+                <strong class="text-success">{{ success }}</strong>
+                {% endif %}
+            </div>
+        </fieldset>
+    </form>
+    {{ pagination }}
+</div>
+{{ footer }}

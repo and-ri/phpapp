@@ -19,6 +19,13 @@ class View {
 
     public function template($template, $data = []) {
         $template = $this->twig->load($template . '.twig');
+
+        $this->filter($data);
+
         return $template->render($data);
+    }
+
+    protected function filter(&$data) {
+        $data['csrf'] = '<input type="hidden" name="csrf" value="' . $this->registry->get('session')->get('token') . '" />';
     }
 }

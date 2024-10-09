@@ -51,7 +51,8 @@ class Router {
 
             if (file_exists($controller_file)) {
                 $this->file = $current_path;
-                $this->controller = 'Controller' . implode('', array_map('ucfirst', explode('/', $current_path)));
+                $this->controller = 'Controller' . implode('', array_map('ucfirst', explode('/', str_replace('_', '', $current_path))));
+
                 $found_controller = true;
 
                 // Check if there's an action specified
