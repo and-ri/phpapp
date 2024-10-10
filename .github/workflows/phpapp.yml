@@ -50,10 +50,13 @@ jobs:
 
     - name: Configure Apache
       run: |
-        sudo cp -r ./* /var/www/html/
+        sudo rm -rf /var/www/html
+        sudo ln -s ${{ github.workspace }}/www /var/www/html
         sudo chown -R www-data:www-data /var/www/html
         sudo chmod -R 755 /var/www/html
         echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/info.php
+        sudo sed -i 's/\/var\/www\/html/\/var\/www\/html\/www/g' /etc/apache2/sites-available/000-default.conf
+        sudo service apache2 restart
 
     - name: Check Apache status
       run: sudo systemctl status apache2
