@@ -35,7 +35,8 @@ jobs:
     - name: Install Apache
       run: |
         sudo apt-get update
-        sudo apt-get install apache2 -y
+        sudo apt-get install apache2 libapache2-mod-php8.3 -y
+        sudo a2enmod php8.3
         sudo a2enmod rewrite
         sudo service apache2 start
 
@@ -57,7 +58,17 @@ jobs:
         echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/info.php
         sudo sed -i 's/\/var\/www\/html/\/var\/www\/html/g' /etc/apache2/sites-available/000-default.conf
         sudo sed -i 's/www-data/runner/g' /etc/apache2/envvars
+        echo "<Directory /var/www/html>
+                Options Indexes FollowSymLinks
+                AllowOverride All
+                Require all granted
+              </Directory>" | sudo tee -a /etc/apache2/apache2.conf
         sudo service apache2 restart
+
+    - name: Check PHP in Apache
+      run: |
+        sudo sed -i '1i<?php phpinfo();' /var/www/html/index.php
+        cat /var/www/html/index.php
 
     - name: Check Apache configuration
       run: sudo apache2ctl -S
