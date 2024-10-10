@@ -1,0 +1,60 @@
+name: PHP CI/CD
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: database
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, intl, pdo_mysql
+
+    - name: Install Apache
+      run: |
+        sudo apt-get update
+        sudo apt-get install apache2 -y
+        sudo a2enmod rewrite
+        sudo service apache2 start
+
+    - name: Create .env file
+      run: |
+        echo "DB_HOST=127.0.0.1" >> .env
+        echo "DB_USER=root" >> .env
+        echo "DB_PASS=" >> .env
+        echo "DB_NAME=database" >> .env
+        echo "DB_PORT=${{ job.services.mysql.ports[3306] }}" >> .env
+        echo "DB_PREFIX=prefix_" >> .env
+
+    - name: Configure Apache
+      run: |
+        sudo cp -r ./* /var/www/html/
+        sudo chown -R www-data:www-data /var/www/html
+        sudo chmod -R 755 /var/www/html
+
+    - name: Test if site is accessible
+      run: |
+        response=$(curl -sS http://localhost)
+        if [[ $response == *"PHP Version"* ]]; then
+          echo "Site is accessible and PHP is working"
+        else
+          echo "Site is not accessible or PHP is not working"
+          exit 1
+        fi
