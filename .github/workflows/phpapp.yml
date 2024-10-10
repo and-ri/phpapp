@@ -27,6 +27,10 @@ jobs:
       with:
         php-version: '8.3'
         extensions: mbstring, intl, pdo_mysql
+        tools: composer:v2
+
+    - name: Install dependencies
+      run: composer install --no-interaction --no-progress
 
     - name: Install Apache
       run: |
@@ -49,13 +53,36 @@ jobs:
         sudo cp -r ./* /var/www/html/
         sudo chown -R www-data:www-data /var/www/html
         sudo chmod -R 755 /var/www/html
+        echo "<?php phpinfo(); ?>" | sudo tee /var/www/html/info.php
+
+    - name: Check Apache status
+      run: sudo systemctl status apache2
+
+    - name: List /var/www/html contents
+      run: ls -la /var/www/html
+
+    - name: Check Apache error log
+      run: sudo cat /var/log/apache2/error.log
 
     - name: Test if site is accessible
       run: |
-        response=$(curl -sS http://localhost)
+        echo "Trying to access http://localhost"
+        response=$(curl -v http://localhost 2>&1)
+        echo "Full curl response:"
+        echo "$response"
         if [[ $response == *"PHP Version"* ]]; then
           echo "Site is accessible and PHP is working"
         else
           echo "Site is not accessible or PHP is not working"
+          echo "Trying to access http://localhost/info.php"
+          response=$(curl -v http://localhost/info.php 2>&1)
+          echo "Full curl response for info.php:"
+          echo "$response"
           exit 1
         fi
+
+    - name: PHP Version
+      run: php -v
+
+    - name: PHP Modules
+      run: php -m
