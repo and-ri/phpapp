@@ -34,5 +34,8 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --no-progress --no-suggest --prefer-dist
 
+    - name: Start PHP server
+      run: php -S localhost:8000 -t www &
+
     - name: Run curl request on main page
-      run: curl -f http://localhost/www/index.php
+      run: curl -f http://localhost:8000
