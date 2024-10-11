@@ -1,80 +1,38 @@
 name: PHP CI/CD
+
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: database
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup PHP
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
-        extensions: mbstring, intl, pdo_mysql
-        tools: composer:v2
-    - name: Install dependencies
-      run: composer install --no-interaction --no-progress
-    - name: Install Apache
-      run: |
-        sudo apt-get update
-        sudo apt-get install apache2 libapache2-mod-php8.3 -y
-        sudo a2enmod php8.3
-        sudo a2enmod rewrite
-        sudo service apache2 start
+        extensions: mbstring, intl, mysqli
+
+    - name: Install MySQL server
+      run: sudo apt-get install -y mysql-server
+
+    - name: Start MySQL service
+      run: sudo service mysql start
+
     - name: Create .env file
-      run: |
-        echo "DB_HOST=127.0.0.1" >> .env
-        echo "DB_USER=root" >> .env
-        echo "DB_PASS=" >> .env
-        echo "DB_NAME=database" >> .env
-        echo "DB_PORT=${{ job.services.mysql.ports[3306] }}" >> .env
-        echo "DB_PREFIX=prefix_" >> .env
-    - name: Configure Apache
-      run: |
-        sudo rm -rf /var/www/html
-        sudo ln -s ${{ github.workspace }}/www /var/www/html
-        sudo chown -R www-data:www-data ${{ github.workspace }}
-        sudo chmod -R 755 ${{ github.workspace }}
-        sudo sed -i 's/\/var\/www\/html/\/var\/www\/html/g' /etc/apache2/sites-available/000-default.conf
-        sudo sed -i 's/www-data/runner/g' /etc/apache2/envvars
-        echo "
-                Options Indexes FollowSymLinks
-                AllowOverride All
-                Require all granted
-              " | sudo tee -a /etc/apache2/apache2.conf
-        sudo service apache2 restart
-    - name: Check Apache status
-      run: sudo service apache2 status
-    - name: Display Apache error logs
-      run: cat /var/log/apache2/error.log
-    - name: Check PHP in Apache
-      run: |
-        response=$(curl -v http://localhost 2>&1)
-        echo "Full curl response:"
-        echo "$response"
-        if [[ $response == *"PHP Version"* ]]; then
-          echo "Site is accessible and PHP is working"
-        else
-          echo "Site is not accessible or PHP is not working"
-          echo "Trying to access http://localhost/info.php"
-          response=$(curl -v http://localhost/info.php 2>&1)
-          echo "Full curl response for info.php:"
-          echo "$response"
-          exit 1
-        fi
-    - name: PHP Version
-      run: php -v
-    - name: PHP Modules
-      run: php -m
+      run: cp .env.example .env
+
+    - name: Install Composer dependencies
+      run: composer install --no-progress --no-suggest --prefer-dist
+
+    - name: Run curl request on main page
+      run: curl -f http://localhost/www/index.php
