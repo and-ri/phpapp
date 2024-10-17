@@ -4,7 +4,7 @@ class App {
     private $registry;
 
     private $model;
-    private $data;
+    public $data;
 
     public function __construct($registry) {
         $this->registry = $registry;
@@ -53,9 +53,5 @@ class App {
 
     public function getModels() {
         return $this->model;
-    }
-
-    public function getData() {
-        return $this->data;
     }
 }

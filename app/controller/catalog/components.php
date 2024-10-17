@@ -3,7 +3,6 @@
 class ControllerCatalogComponents extends Controller {
     public function index() {
         $this->app->useLanguage('catalog/components');
-        $this->data = $this->language->all();
 
         $this->response->setTitle($this->language->get('meta_title'));
         $this->response->setDescription($this->language->get('meta_description'));

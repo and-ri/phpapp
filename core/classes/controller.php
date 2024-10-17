@@ -12,7 +12,7 @@ class Controller {
         $this->args = $args;
 
         $this->model = $this->app->getModels();
-        $this->data = $this->app->getData();
+        $this->data = &$this->app->data;
     }
 
     public function __get($key) {
