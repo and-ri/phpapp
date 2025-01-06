@@ -104,4 +104,10 @@ class Response {
 
         echo json_encode($data, $pretty ? JSON_PRETTY_PRINT : 0);
     }
+
+    public function redirect($url, $status = 302) {
+        header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url), true, $status);
+
+        exit();
+    }
 }
