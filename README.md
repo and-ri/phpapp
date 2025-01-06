@@ -55,6 +55,7 @@
 - **app.php**: Manages the application lifecycle, including initialization and configuration.
 - **db.php**: Provides methods for database queries and connection handling.
 - **env.php**: Handles environment variables and configuration settings.
+- **google_auth.php**: This file handles the Google authentication process for the application.
 - **language.php**: Loads and manages language files for multi-language support.
 - **load.php**: Loads models and controllers dynamically.
 - **pagination.php**: Provides simple pagination functionality.
