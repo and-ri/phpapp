@@ -29,7 +29,7 @@ class Db {
         $result = $this->adaptor->query($sql);
         if ($result instanceof mysqli_result) {
             if ($rows) {
-                $output = $result->num_rows ? $result->fetch_all(MYSQLI_ASSOC) : false;
+                $output = $result->num_rows ? $result->fetch_all(MYSQLI_ASSOC) : array();
             } else {
                 $output = $result->num_rows ? $result->fetch_assoc() : false;
             }
