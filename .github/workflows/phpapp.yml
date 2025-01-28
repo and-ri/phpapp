@@ -35,7 +35,6 @@ jobs:
         sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('') WHERE User='root';"
         sudo mysql -e "FLUSH PRIVILEGES;"
         sudo mysql -e "CREATE DATABASE IF NOT EXISTS phpapp;"
-        sudo service mysql start
 
     - name: Create .env file
       run: |
