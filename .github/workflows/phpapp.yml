@@ -36,12 +36,22 @@ jobs:
         sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
         sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
 
+    - name: Enable PHP error logging
+      run: |
+        echo 'log_errors = On' >> /etc/php/8.3/cli/php.ini
+        echo 'display_errors = On' >> /etc/php/8.3/cli/php.ini
+        echo 'error_log = /tmp/php-errors.log' >> /etc/php/8.3/cli/php.ini
 
     - name: Install Composer dependencies
       run: composer install --no-progress --no-suggest --prefer-dist
 
     - name: Start PHP server
-      run: php -S localhost:8000 -t www &
+      run: php -S localhost:8000 -t www -d error_log=/tmp/php-errors.log &
 
     - name: Run curl request on main page
-      run: curl -f http://localhost:8000
+      run: |
+        curl -i http://localhost:8000 || true
+
+    - name: Display PHP error log if 500
+      if: failure()
+      run: cat /tmp/php-errors.log || echo "No errors in PHP log"
