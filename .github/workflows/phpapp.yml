@@ -2,74 +2,98 @@ name: PHP CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: phpapp
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-    - name: Set up PHP
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
-        extensions: mbstring, intl, mysqli
+        extensions: mbstring, intl, mysqli, zip
+        coverage: xdebug
+        tools: composer:v2
 
-    - name: Install MySQL server
-      run: sudo apt-get install -y mysql-server
+    - name: Validate composer.json
+      run: composer validate --strict
 
-    - name: Start MySQL service
-      run: sudo service mysql start
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
 
-    - name: Set MySQL root password and create database
-      run: |
-        sudo mysqld_safe --skip-grant-tables --skip-networking &
-        sleep 5
-        sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('') WHERE User='root';"
-        sudo mysql -e "FLUSH PRIVILEGES;"
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS phpapp;"
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
 
     - name: Create .env file
       run: |
         cp .env.example .env
-        sed -i 's/^DB_HOST=.*/DB_HOST=localhost/' .env
+        sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
         sed -i 's/^DB_DATABASE=.*/DB_DATABASE=phpapp/' .env
         sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
-        sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=/' .env
+        sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
 
-    - name: Enable PHP error logging
+    - name: Configure PHP
       run: |
-        echo 'log_errors = On' >> /etc/php/8.3/cli/php.ini
-        echo 'display_errors = On' >> /etc/php/8.3/cli/php.ini
-        echo 'error_log = /tmp/php-errors.log' >> /etc/php/8.3/cli/php.ini
+        echo "date.timezone=UTC" | sudo tee -a /etc/php/8.3/cli/php.ini
+        echo "memory_limit=512M" | sudo tee -a /etc/php/8.3/cli/php.ini
+        echo "error_reporting=E_ALL" | sudo tee -a /etc/php/8.3/cli/php.ini
+        echo "display_errors=On" | sudo tee -a /etc/php/8.3/cli/php.ini
+        echo "log_errors=On" | sudo tee -a /etc/php/8.3/cli/php.ini
+        echo "error_log=/tmp/php-errors.log" | sudo tee -a /etc/php/8.3/cli/php.ini
 
-    - name: Install Composer dependencies
-      run: composer install --no-progress --no-suggest --prefer-dist
+    - name: Run PHP built-in server
+      run: php -S 127.0.0.1:8000 -t public &
 
-    - name: Start PHP server
-      run: php -S localhost:8000 -t www -d error_log=/tmp/php-errors.log &
-
-    - name: Run curl request on main page
+    - name: Wait for server to start
       run: |
-        curl -f http://localhost:8000
-        if [ $? -ne 0 ]; then
-          echo "Error: HTTP request failed."
+        timeout=30
+        until curl -s -f http://127.0.0.1:8000 > /dev/null || [ $timeout -eq 0 ]; do
+          echo "Waiting for PHP server to start..."
+          sleep 1
+          ((timeout--))
+        done
+        if [ $timeout -eq 0 ]; then
+          echo "Timeout waiting for PHP server"
           exit 1
         fi
 
-    - name: Check PHP error log for failures
+    - name: Check for PHP errors
+      if: always()
       run: |
-        if grep -q "Fatal error" /tmp/php-errors.log; then
-          echo "Error: Fatal error found in PHP logs."
-          cat /tmp/php-errors.log
-          exit 1
+        if [ -f "/tmp/php-errors.log" ]; then
+          if grep -iE "fatal|error|warning" /tmp/php-errors.log; then
+            echo "PHP errors found:"
+            cat /tmp/php-errors.log
+            exit 1
+          else
+            echo "No critical PHP errors found."
+          fi
         else
-          echo "No fatal errors found in PHP logs."
+          echo "No PHP error log file found."
         fi
