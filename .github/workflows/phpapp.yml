@@ -2,40 +2,133 @@ name: PHP CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: phpapp
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-    - name: Set up PHP
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
-        extensions: mbstring, intl, mysqli
+        extensions: mbstring, intl, mysqli, zip
+        coverage: none
+        tools: composer:v2
+        ini-values: |
+          opcache.enable=1
+          opcache.enable_cli=1
+          opcache.jit=0
+          display_errors=On
+          display_startup_errors=On
+          error_reporting=E_ALL
 
-    - name: Install MySQL server
-      run: sudo apt-get install -y mysql-server
+    - name: Check PHP installation
+      run: |
+        php -v
+        php -m
+        php --ini
 
-    - name: Start MySQL service
-      run: sudo service mysql start
+    - name: Validate composer.json
+      run: composer validate --strict
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
 
     - name: Create .env file
-      run: cp .env.example .env
+      run: |
+        cp .env.example .env
+        sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+        sed -i 's/^DB_DATABASE=.*/DB_DATABASE=phpapp/' .env
+        sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+        sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
 
-    - name: Install Composer dependencies
-      run: composer install --no-progress --no-suggest --prefer-dist
+    - name: Verify project structure
+      run: |
+        echo "Current directory structure:"
+        ls -la
+        if [ -d "public" ]; then
+          echo "Contents of public directory:"
+          ls -la public
+        else
+          echo "public directory not found!"
+          echo "Contents of root directory:"
+          ls -la
+        fi
 
     - name: Start PHP server
-      run: php -S localhost:8000 -t www &
+      run: |
+        # Determine the correct document root
+        if [ -d "public" ]; then
+          DOCROOT="public"
+        elif [ -d "www" ]; then
+          DOCROOT="www"
+        else
+          DOCROOT="."
+        fi
+        echo "Using document root: $DOCROOT"
+        
+        # Start PHP server with error logging
+        php -S 127.0.0.1:8000 -t $DOCROOT > php-server.log 2>&1 &
+        echo $! > php-server.pid
+        
+        # Give it a moment to start
+        sleep 2
+        
+        # Check if process is running
+        if ps -p $(cat php-server.pid) > /dev/null; then
+          echo "PHP server process is running"
+        else
+          echo "PHP server failed to start"
+          cat php-server.log
+          exit 1
+        fi
 
-    - name: Run curl request on main page
-      run: curl -f http://localhost:8000
+    - name: Wait for server and check health
+      run: |
+        max_attempts=30
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt of $max_attempts"
+          
+          if curl -s -f http://127.0.0.1:8000 > /dev/null 2>&1; then
+            echo "Server is responding!"
+            exit 0
+          fi
+          
+          # Check if server is still running
+          if ! ps -p $(cat php-server.pid) > /dev/null; then
+            echo "PHP server has died. Server log:"
+            cat php-server.log
+            exit 1
+          fi
+          
+          sleep 1
+          attempt=$((attempt + 1))
+        done
+        
+        echo "Server failed to respond after $max_attempts attempts"
+        echo "PHP Server log:"
+        cat php-server.log
+        exit 1
