@@ -29,7 +29,12 @@ jobs:
       run: sudo service mysql start
 
     - name: Create .env file
-      run: cp .env.example .env
+      run: 
+        - cp .env.example .env
+        - sed -i 's/DB_HOST=/DB_HOST=localhost/' .env
+        - sed -i 's/DB_DATABASE=/DB_DATABASE=phpapp/' .env
+        - sed -i 's/DB_USERNAME=/DB_USERNAME=root/' .env
+        - sed -i 's/DB_PASSWORD=/DB_PASSWORD=/' .env
 
     - name: Install Composer dependencies
       run: composer install --no-progress --no-suggest --prefer-dist
