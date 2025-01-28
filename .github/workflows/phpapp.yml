@@ -33,24 +33,24 @@ jobs:
       with:
         php-version: '8.3'
         extensions: mbstring, intl, mysqli, zip
-        coverage: none  # Removed xdebug to avoid JIT conflicts
+        coverage: none
         tools: composer:v2
         ini-values: |
           opcache.enable=1
           opcache.enable_cli=1
-          opcache.jit=0  # Disable JIT to prevent warnings
+          opcache.jit=0
+          display_errors=On
+          display_startup_errors=On
+          error_reporting=E_ALL
+
+    - name: Check PHP installation
+      run: |
+        php -v
+        php -m
+        php --ini
 
     - name: Validate composer.json
       run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
@@ -63,35 +63,72 @@ jobs:
         sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
         sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
 
-    - name: Wait for MySQL
+    - name: Verify project structure
       run: |
-        while ! mysqladmin ping -h"127.0.0.1" -P"3306" -u"root" -p"root" --silent; do
-          sleep 1
-        done
+        echo "Current directory structure:"
+        ls -la
+        if [ -d "public" ]; then
+          echo "Contents of public directory:"
+          ls -la public
+        else
+          echo "public directory not found!"
+          echo "Contents of root directory:"
+          ls -la
+        fi
 
-    - name: Run PHP built-in server
-      run: php -S 127.0.0.1:8000 -t public &
-
-    - name: Wait for server to start
+    - name: Start PHP server
       run: |
-        timeout=30
-        until curl -s -f http://127.0.0.1:8000 > /dev/null || [ $timeout -eq 0 ]; do
-          echo "Waiting for PHP server to start..."
-          sleep 1
-          ((timeout--))
-        done
-        if [ $timeout -eq 0 ]; then
-          echo "Timeout waiting for PHP server"
+        # Determine the correct document root
+        if [ -d "public" ]; then
+          DOCROOT="public"
+        elif [ -d "www" ]; then
+          DOCROOT="www"
+        else
+          DOCROOT="."
+        fi
+        echo "Using document root: $DOCROOT"
+        
+        # Start PHP server with error logging
+        php -S 127.0.0.1:8000 -t $DOCROOT > php-server.log 2>&1 &
+        echo $! > php-server.pid
+        
+        # Give it a moment to start
+        sleep 2
+        
+        # Check if process is running
+        if ps -p $(cat php-server.pid) > /dev/null; then
+          echo "PHP server process is running"
+        else
+          echo "PHP server failed to start"
+          cat php-server.log
           exit 1
         fi
 
-    - name: Check application health
+    - name: Wait for server and check health
       run: |
-        response=$(curl -s -w "\n%{http_code}" http://127.0.0.1:8000)
-        http_code=$(echo "$response" | tail -n1)
-        if [ "$http_code" -ne 200 ]; then
-          echo "Application health check failed with HTTP code: $http_code"
-          echo "Response body:"
-          echo "$response" | head -n-1
-          exit 1
-        fi
+        max_attempts=30
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt of $max_attempts"
+          
+          if curl -s -f http://127.0.0.1:8000 > /dev/null 2>&1; then
+            echo "Server is responding!"
+            exit 0
+          fi
+          
+          # Check if server is still running
+          if ! ps -p $(cat php-server.pid) > /dev/null; then
+            echo "PHP server has died. Server log:"
+            cat php-server.log
+            exit 1
+          fi
+          
+          sleep 1
+          attempt=$((attempt + 1))
+        done
+        
+        echo "Server failed to respond after $max_attempts attempts"
+        echo "PHP Server log:"
+        cat php-server.log
+        exit 1
