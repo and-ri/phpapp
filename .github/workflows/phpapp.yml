@@ -25,6 +25,9 @@ jobs:
     - name: Install MySQL server
       run: sudo apt-get install -y mysql-server
 
+    - name: Start MySQL service
+      run: sudo service mysql start
+
     - name: Set MySQL root password and create database
       run: |
         sudo mysqld_safe --skip-grant-tables --skip-networking &
