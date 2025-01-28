@@ -28,6 +28,12 @@ jobs:
     - name: Start MySQL service
       run: sudo service mysql start
 
+    - name: Set MySQL root password and create database
+      run: |
+        sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
+        sudo mysql -e "FLUSH PRIVILEGES;"
+        sudo mysql -e "CREATE DATABASE IF NOT EXISTS phpapp;"
+
     - name: Create .env file
       run: |
         cp .env.example .env
@@ -50,8 +56,18 @@ jobs:
 
     - name: Run curl request on main page
       run: |
-        curl -i http://localhost:8000 || true
+        curl -f http://localhost:8000
+        if [ $? -ne 0 ]; then
+          echo "Error: HTTP request failed."
+          exit 1
+        fi
 
-    - name: Display PHP error log if 500
-      if: failure()
-      run: cat /tmp/php-errors.log || echo "No errors in PHP log"
+    - name: Check PHP error log for failures
+      run: |
+        if grep -q "Fatal error" /tmp/php-errors.log; then
+          echo "Error: Fatal error found in PHP logs."
+          cat /tmp/php-errors.log
+          exit 1
+        else
+          echo "No fatal errors found in PHP logs."
+        fi
