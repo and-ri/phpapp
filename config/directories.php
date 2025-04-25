@@ -9,6 +9,7 @@ define('DIR_DATABASE', DIR_ROOT . '/database/');
 define('DIR_STATIC', DIR_ROOT . '/static/');
 define('DIR_WWW', DIR_ROOT . '/www/');
 define('DIR_DATA', DIR_ROOT . '/data/');
+define('DIR_LOG', DIR_ROOT . '/logs/');
 
 // Define the subdirectories
 define('DIR_SESSION', DIR_DATA . 'session/');
