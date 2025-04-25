@@ -6,6 +6,20 @@ require_once DIR_CORE . 'router.php';
 
 $registry = new Registry();
 
+$registry->set('phplog', new Log('phpapp', 'php.log'));
+
+set_error_handler(function ($errno, $errstr, $errfile, $errline) use ($log) {
+    $log->error("PHP Error: [$errno] $errstr in $errfile on line $errline");
+    return false;
+});
+
+set_exception_handler(function ($exception) use ($log) {
+    $log->exception($exception);
+});
+
+ini_set('log_errors', '1');
+ini_set('error_log', DIR_LOG . 'php_errors.log');
+
 $registry->set('env', new Env());
 $registry->set('request', new Request());
 $registry->set('load', new Load($registry));
