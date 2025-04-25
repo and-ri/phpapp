@@ -32,4 +32,8 @@ class Log {
     public function log($level, $message, array $context = []) {
         $this->logger->log($level, $message, $context);
     }
+
+    public function exception(\Throwable $exception) {
+        $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+    }
 }
