@@ -20,6 +20,7 @@ set_exception_handler(function ($exception) use ($log) {
 ini_set('log_errors', '1');
 ini_set('error_log', DIR_LOG . 'php_errors.log');
 
+$registry->set('log', new Log());
 $registry->set('env', new Env());
 $registry->set('request', new Request());
 $registry->set('load', new Load($registry));
