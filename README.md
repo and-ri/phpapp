@@ -1,9 +1,9 @@
 # PHPapp Framework
 
-**PHPapp** is a lightweight PHP framework designed for quick and efficient web application development. It follows the MVC (Model-View-Controller) architecture and provides core components for database interaction, session management, request handling, and more.
+**PHPapp** is a lightweight PHP framework designed for quick and efficient web application development. It follows the MVC (Model-View-Controller) architecture and provides core components for data management, routing, and user interaction.
 
 > [@and-ri](https://github.com/and-ri):
-> Hello everyone! I am very excited to share with you a version of my PHP framework. Maybe it is far from such giants as Laravel or Yii, but it has become very convenient for me. Especially for quick deployment of small web applications or prototypes.
+> Hello everyone! I am very excited to share with you a version of my PHP framework. Maybe it is far from such giants as Laravel or Yii, but it has become very convenient for me. Especially for quick prototyping and small applications.
 > 
 > I will be happy for any contribution :)
 
@@ -11,8 +11,10 @@
 
 - **MVC Architecture:** Clean separation of concerns with models, views, and controllers to organize code logically.
 - **Core Components:** Includes essential libraries for handling sessions, database connections, request processing, and URL routing.
+- **Migration System:** Built-in system for managing database schema changes and versioning.
+- **Installer:** Interactive installer for quick setup, including `.env` generation, Composer installation, and database migration execution.
 - **Easy to Install and Configure:** Minimal setup required for developers to get started quickly.
-  
+
 ## Requirements
 
 - PHP 8+
@@ -39,7 +41,9 @@
     composer install
     ```
 
-4. Create `.env` file
+4. Run the installer:
+    Open `http://yourdomain.com/installer.php` in your browser and follow the on-screen instructions to set up the database and configuration.
+
 5. Done!
 
 ## Core Components
@@ -55,7 +59,7 @@
 - **app.php**: Manages the application lifecycle, including initialization and configuration.
 - **db.php**: Provides methods for database queries and connection handling.
 - **env.php**: Handles environment variables and configuration settings.
-- **google_auth.php**: This file handles the Google authentication process for the application.
+- **google_auth.php**: Handles the Google authentication process for the application.
 - **language.php**: Loads and manages language files for multi-language support.
 - **load.php**: Loads models and controllers dynamically.
 - **pagination.php**: Provides simple pagination functionality.
@@ -64,6 +68,11 @@
 - **session.php**: Facilitates session management (start, get, set, remove, etc.).
 - **staticfile.php**: Serves static files (CSS, JS, images).
 - **url.php**: Generates URLs and manages routing.
+
+### New Features
+
+- **Migration System:** Manage database schema changes with ease. Use `php migrate.php migrate` to apply migrations, `php migrate.php rollback` to undo the last migration, and `php migrate.php status` to check migration status.
+- **Interactive Installer:** Quickly set up your application by providing database and web configuration details in a user-friendly web installer.
 
 ## License
 
