@@ -6,7 +6,7 @@ require_once DIR_CORE . 'router.php';
 
 $registry = new Registry();
 
-$registry->set('phplog', new Log('phpapp', 'php.log'));
+$log = new Log('phpapp', 'php.log');
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline) use ($log) {
     $log->error("PHP Error: [$errno] $errstr in $errfile on line $errline");
