@@ -68,11 +68,13 @@
 - **session.php**: Facilitates session management (start, get, set, remove, etc.).
 - **staticfile.php**: Serves static files (CSS, JS, images).
 - **url.php**: Generates URLs and manages routing.
+- **log.php**: Provides centralized logging functionality using Monolog.
 
 ### New Features
 
 - **Migration System:** Manage database schema changes with ease. Use `php migrate.php migrate` to apply migrations, `php migrate.php rollback` to undo the last migration, and `php migrate.php status` to check migration status.
 - **Interactive Installer:** Quickly set up your application by providing database and web configuration details in a user-friendly web installer.
+- **Centralized Logging:** Monitor application events, errors, and debugging information using the integrated Monolog-based logging system.
 
 ## License
 
