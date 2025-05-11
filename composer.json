@@ -7,7 +7,8 @@
         "twig/twig": "^3.9",
         "vlucas/phpdotenv": "^5.6",
         "google/apiclient": "^2.0",
-        "monolog/monolog": "^3.9"
+        "monolog/monolog": "^3.9",
+        "melbahja/seo": "^2.1"
     },
     "config": {
         "vendor-dir": "core/vendor"

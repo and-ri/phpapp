@@ -2,12 +2,8 @@
 
 class ControllerCommonHeader extends Controller {
     public function index() {
-        $this->data['title'] = $this->response->getTitle();
-        $this->data['description'] = $this->response->getDescription();
-        $this->data['keywords'] = $this->response->getKeywords();
-        $this->data['robots'] = $this->response->getRobots();
-        $this->data['canonical'] = $this->response->getCanonical();
-        $this->data['links'] = $this->response->getLinks();
+        $this->data['meta'] = $this->meta->getMetaTags();
+
         $this->data['styles'] = $this->response->getStyles();
         
         $scripts = $this->response->getScripts();

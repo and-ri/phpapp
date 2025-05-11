@@ -4,7 +4,6 @@ return [
     'heading_title' => 'CSRF Protection',
     'meta_title' => 'CSRF Protection',
     'meta_description' => 'CSRF Protection',
-    'meta_keywords' => 'CSRF Protection',
     'text_form' => 'Form',
     'entry_email' => 'Email',
     'entry_password' => 'Password',

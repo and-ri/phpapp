@@ -3,22 +3,7 @@
 <head>
     <meta charset="{{ charset }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    {% if description %}
-    <meta name="description" content="{{ description }}">
-    {% endif %}
-    {% if keywords %}
-    <meta name="keywords" content="{{ keywords }}">
-    {% endif %}
-    {% if robots %}
-    <meta name="robots" content="{{ robots }}">
-    {% endif %}
-    {% if canonical %}
-    <link rel="canonical" href="{{ canonical }}">
-    {% endif %}
-    {% for link in links %}
-    <link rel="{{ link.rel }}" href="{{ link.href }}">
-    {% endfor %}
+    {{ meta }}
     {% for style in styles %}
     <link rel="stylesheet" href="{{ style }}">
     {% endfor %}

@@ -5,9 +5,8 @@ class ControllerCatalogPagination extends Controller {
         $this->app->useLanguage('catalog/pagination');
         $this->app->useModel('demo/demo');
         
-        $this->response->setTitle($this->language->get('meta_title'));
-        $this->response->setDescription($this->language->get('meta_description'));
-        $this->response->setKeywords($this->language->get('meta_keywords'));
+        $this->meta->setTitle($this->language->get('meta_title'));
+        $this->meta->setDescription($this->language->get('meta_description'));
 
         $page = isset($this->request->get['page']) ? $this->request->get['page'] : 1;
 

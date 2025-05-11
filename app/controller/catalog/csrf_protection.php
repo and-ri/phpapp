@@ -6,9 +6,8 @@ class ControllerCatalogCsrfProtection extends Controller {
     public function index() {
         $this->app->useLanguage('catalog/csrf_protection');
 
-        $this->response->setTitle($this->language->get('meta_title'));
-        $this->response->setDescription($this->language->get('meta_description'));
-        $this->response->setKeywords($this->language->get('meta_keywords'));
+        $this->meta->setTitle($this->language->get('meta_title'));
+        $this->meta->setDescription($this->language->get('meta_description'));
 
         $this->data['action'] = $this->url->link('catalog/csrf_protection');
 
