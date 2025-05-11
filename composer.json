@@ -1,15 +1,35 @@
 {
-    "name": "dotari/php-app",
-    "description": "Simple PHP Framework",
+    "name": "and-ri/phpapp",
+    "description": "PHPapp is a lightweight PHP framework designed for quick and efficient web application development. It follows the MVC architecture and provides core components for database interaction, session management, request handling, and more.",
+    "keywords": ["php", "framework", "mvc", "web development", "lightweight"],
     "type": "project",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrii",
+            "email": "ryabchenko.andrew@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
+        "php": "^8.0",
         "twig/twig": "^3.9",
         "vlucas/phpdotenv": "^5.6",
         "google/apiclient": "^2.0",
         "monolog/monolog": "^3.9",
         "melbahja/seo": "^2.1"
     },
+    "autoload": {
+        "psr-4": {
+            "PHPapp\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/and-ri/phpapp"
+        }
+    ],
     "config": {
         "vendor-dir": "core/vendor"
     }
