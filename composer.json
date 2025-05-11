@@ -19,11 +19,6 @@
         "monolog/monolog": "^3.9",
         "melbahja/seo": "^2.1"
     },
-    "autoload": {
-        "psr-4": {
-            "PHPapp\\": "src/"
-        }
-    },
     "repositories": [
         {
             "type": "vcs",
