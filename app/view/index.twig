@@ -1,24 +1,73 @@
 {{ header }}
-<section id="welcome">
+<section id="hero" class="bg-warning py-5">
+    <div class="container text-center">
+        <h1 class="display-4">Welcome to PHPapp</h1>
+        <p class="lead">A lightweight PHP framework for quick and efficient web application development.</p>
+        <a href="#features" class="btn btn-light btn-lg mt-3">Learn More</a>
+    </div>
+</section>
+
+<section class="py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <img src="{{ cover }}" alt="Welcome to the PHP App" class="img-fluid">
+                <img src="{{ cover }}" alt="Welcome to PHP App" class="img-fluid rounded shadow">
             </div>
             <div class="col-lg-6">
-                <h1>Welcome to the PHP App</h1>
-                <p>This is a simple PHP application that uses the MVC pattern. It is a starting point for building a PHP application from scratch.</p>
-                <h2>What is MVC?</h2>
-                <p>MVC stands for Model-View-Controller. It is a design pattern that separates the application into three main components: the model, the view, and the controller.</p>
-                <h2>What is this application using?</h2>
-                <p>This application is using the following technologies:</p>
-                <ul>
-                    <li>PHP</li>
-                    <li>Twig</li>
-                    <li>Bootstrap</li>
-                    <li>jQuery</li>
+                <h2 class="mb-4">Why Choose PHPapp?</h2>
+                <p class="text-muted">PHPapp is designed for developers who need a clean and efficient starting point for their projects. It follows the MVC architecture for better code organization and scalability.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-check-circle text-warning"></i> Lightweight and fast</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-warning"></i> Easy to learn and use</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-warning"></i> Built with modern tools</li>
                 </ul>
+            </div>
         </div>
     </div>
 </section>
+
+<section id="features" class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="mb-4">Features</h2>
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 border rounded shadow-sm">
+                    <i class="bi bi-code-slash display-4 text-warning"></i>
+                    <h5 class="mt-3">MVC Architecture</h5>
+                    <p class="text-muted">Organize your code with Models, Views, and Controllers.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 border rounded shadow-sm">
+                    <i class="bi bi-gear-fill display-4 text-warning"></i>
+                    <h5 class="mt-3">Core Components</h5>
+                    <p class="text-muted">Includes sessions, routing, and database handling.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 border rounded shadow-sm">
+                    <i class="bi bi-lightning-fill display-4 text-warning"></i>
+                    <h5 class="mt-3">High Performance</h5>
+                    <p class="text-muted">Optimized for speed and reliability in all environments.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 border rounded shadow-sm">
+                    <i class="bi bi-bootstrap-fill display-4 text-warning"></i>
+                    <h5 class="mt-3">Bootstrap UI</h5>
+                    <p class="text-muted">Built-in Bootstrap integration for responsive design.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="get-started" class="py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Get Started</h2>
+        <p class="text-muted">Start building your next project with PHPapp today!</p>
+        <a href="https://github.com/and-ri/phpapp" class="btn btn-warning btn-lg"><i class="bi bi-github"></i> View on GitHub</a>
+    </div>
+</section>
+
 {{ footer }}
