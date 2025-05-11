@@ -5,6 +5,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbName = $_POST['db_name'] ?? 'database';
     $dbUser = $_POST['db_user'] ?? 'root';
     $dbPassword = $_POST['db_password'] ?? '';
+    $dbPort = $_POST['db_port'] ?? '3306';
+    $dbPrefix = $_POST['db_prefix'] ?? 'prefix_';
 
     // Get form data for web config
     $useSSL = isset($_POST['use_ssl']) ? true : false;
@@ -12,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $defaultLanguage = $_POST['default_language'] ?? 'en';
 
     // Generate .env file
-    $envContent = "DB_HOST=\"$dbHost\"\nDB_NAME=\"$dbName\"\nDB_USER=\"$dbUser\"\nDB_PASS=\"$dbPassword\"\n";
+    $envContent = "DB_HOST=\"$dbHost\"\nDB_NAME=\"$dbName\"\nDB_USER=\"$dbUser\"\nDB_PASS=\"$dbPassword\"\nDB_PORT=\"$dbPort\"\nDB_PREFIX=\"$dbPrefix\"\n";
     file_put_contents(__DIR__ . '/../.env', $envContent);
 
     // Generate web.php config
@@ -27,6 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check if composer.phar exists
     if (!file_exists(__DIR__ . '/../composer.phar')) {
+        // Check if exec is available
+        if (!function_exists('exec') || in_array('exec', array_map('trim', explode(',', ini_get('disable_functions'))))) {
+            echo '<div class="alert alert-warning">
+                <strong>Warning:</strong> The exec function is disabled on this server. 
+                Please manually install Composer and dependencies by running these commands in your terminal:
+                <pre>
+cd ' . dirname(__DIR__) . '
+php -r "copy(\'https://getcomposer.org/installer\', \'composer-setup.php\');"
+php composer-setup.php
+php -r "unlink(\'composer-setup.php\');"
+php composer.phar install
+php migrate.php migrate
+                </pre>
+                Then reload this page after completing these steps.
+                </div>';
+            exit;
+        }
+        
         // Download composer.phar
         file_put_contents('composer-setup.php', file_get_contents('https://getcomposer.org/installer'));
         exec('php composer-setup.php', $output, $returnVar);
@@ -36,6 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Check if exec is available before continuing with other commands
+    if (!function_exists('exec') || in_array('exec', array_map('trim', explode(',', ini_get('disable_functions'))))) {
+        echo '<div class="alert alert-warning">
+            <strong>Warning:</strong> The exec function is disabled on this server. 
+            Please manually complete the installation by running these commands in your terminal:
+            <pre>
+cd ' . dirname(__DIR__) . '
+php composer.phar install
+php migrate.php migrate
+            </pre>
+            Then reload this page after completing these steps.
+            </div>';
+        exit;
+    }
+    
     // Run composer install
     exec('php ' . __DIR__ . '/../composer.phar install', $output, $returnVar);
     if ($returnVar !== 0) {
@@ -81,6 +116,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label for="db_password" class="form-label">Database Password</label>
                 <input type="password" class="form-control" id="db_password" name="db_password" placeholder="<password>" value="">
+            </div>
+            <div class="mb-3">
+                <label for="db_port" class="form-label">Database Port</label>
+                <input type="text" class="form-control" id="db_port" name="db_port" required value="3306">
+            </div>
+            <div class="mb-3">
+                <label for="db_prefix" class="form-label">Table Prefix</label>
+                <input type="text" class="form-control" id="db_prefix" name="db_prefix" required value="prefix_">
             </div>
         </div>
         <div class="bg-light p-4 mb-4">

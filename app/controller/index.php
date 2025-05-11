@@ -2,11 +2,12 @@
 
 class ControllerIndex extends Controller {
     public function index() {
-        $this->response->setTitle($this->language->get('meta_title'));
-        $this->response->setDescription($this->language->get('meta_description'));
-        $this->response->setKeywords($this->language->get('meta_keywords'));
+        $this->meta->setTitle($this->language->get('meta_title'));
+        $this->meta->setDescription($this->language->get('meta_description'));
 
         $this->data['heading_title'] = $this->language->get('heading_title');
+
+        $this->data['cover'] = $this->staticfile->getUri('img/welcome.png');
 
         $this->data['header'] = $this->load->controller('common/header');
 

@@ -1,8 +1,19 @@
 <?php
 
-require_once 'core/library/db.php';
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('max_execution_time', 0);
 
-$db = new Db(null); // Initialize the database connection
+require_once 'config/directories.php';
+require_once DIR_CORE . 'registry.php';
+require_once DIR_CORE . 'autoload.php';
+
+$registry = new Registry();
+
+$registry->set('env', new Env());
+
+$db = new Db($registry);
 
 $command = $argv[1] ?? null;
 
@@ -57,7 +68,7 @@ function migrate($db) {
 function rollback($db) {
     echo "Rolling back last migration...\n";
 
-    $lastMigration = $db->query("SELECT migration FROM migrations ORDER BY id DESC LIMIT 1")[0]['migration'] ?? null;
+    $lastMigration = $db->query("SELECT migration FROM migrations ORDER BY id DESC LIMIT 1", true)[0]['migration'] ?? null;
 
     if ($lastMigration) {
         require_once __DIR__ . "/migrations/$lastMigration.php";

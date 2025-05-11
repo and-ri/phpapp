@@ -33,6 +33,7 @@ $registry->set('url', new Url());
 $registry->set('session', new Session($registry));
 $registry->set('pagination', new Pagination());
 $registry->set('google_auth', new google_auth($registry));
+$registry->set('meta', new Meta());
 
 $registry->set('view', new View($registry));
 

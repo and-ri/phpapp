@@ -4,9 +4,8 @@ class ControllerCatalogComponents extends Controller {
     public function index() {
         $this->app->useLanguage('catalog/components');
 
-        $this->response->setTitle($this->language->get('meta_title'));
-        $this->response->setDescription($this->language->get('meta_description'));
-        $this->response->setKeywords($this->language->get('meta_keywords'));
+        $this->meta->setTitle($this->language->get('meta_title'));
+        $this->meta->setDescription($this->language->get('meta_description'));
 
         $this->response->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
         $this->response->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');

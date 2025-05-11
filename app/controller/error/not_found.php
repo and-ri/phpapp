@@ -4,9 +4,8 @@ class ControllerErrorNotFound extends Controller {
     public function index() {
         $this->app->useLanguage('error/not_found');
 
-        $this->response->setTitle($this->language->get('meta_title'));
-        $this->response->setDescription($this->language->get('meta_description'));
-        $this->response->setKeywords($this->language->get('meta_keywords'));
+        $this->meta->setTitle($this->language->get('meta_title'));
+        $this->meta->setDescription($this->language->get('meta_description'));
 
         $this->data['heading_title'] = $this->language->get('heading_title');
 

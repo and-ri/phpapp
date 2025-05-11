@@ -69,12 +69,14 @@
 - **staticfile.php**: Serves static files (CSS, JS, images).
 - **url.php**: Generates URLs and manages routing.
 - **log.php**: Provides centralized logging functionality using Monolog.
+- **meta.php**: Manages SEO metadata including page titles, descriptions, Open Graph tags, and robots directives using the Melbahja/Seo package.
 
 ### New Features
 
 - **Migration System:** Manage database schema changes with ease. Use `php migrate.php migrate` to apply migrations, `php migrate.php rollback` to undo the last migration, and `php migrate.php status` to check migration status.
 - **Interactive Installer:** Quickly set up your application by providing database and web configuration details in a user-friendly web installer.
 - **Centralized Logging:** Monitor application events, errors, and debugging information using the integrated Monolog-based logging system.
+- **SEO Management:** Easily manage page metadata, title tags, Open Graph properties, and other SEO essentials using the integrated meta.php library powered by Melbahja/Seo package.
 
 ## License
 
