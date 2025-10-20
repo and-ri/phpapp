@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
 /*
     Here you can add your custom CSS styles.
 */

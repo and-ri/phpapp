@@ -39,6 +39,7 @@
 
     ```bash
     composer install
+    npm run build
     ```
 
 4. Run the installer:

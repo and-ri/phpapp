@@ -5,6 +5,8 @@ class ControllerCommonHeader extends Controller {
         $this->data['meta'] = $this->meta->getMetaTags();
 
         $this->data['styles'] = $this->response->getStyles();
+
+        $this->response->addScript('/assets/js/app.js');
         
         $scripts = $this->response->getScripts();
 
@@ -18,9 +20,7 @@ class ControllerCommonHeader extends Controller {
 
         $this->data['menu'] = $this->load->controller('common/menu');
 
-        $this->response->addStyle('https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
-        $this->response->addStyle('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
-        $this->response->addStyle($this->staticfile->getUri('css/style.css'));
+        $this->response->addStyle('/assets/css/app.css');
 
         $this->data['styles'] = $this->response->getStyles();
 

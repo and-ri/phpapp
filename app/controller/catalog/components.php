@@ -7,9 +7,6 @@ class ControllerCatalogComponents extends Controller {
         $this->meta->setTitle($this->language->get('meta_title'));
         $this->meta->setDescription($this->language->get('meta_description'));
 
-        $this->response->addStyle('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css');
-        $this->response->addScript('https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js');
-
         $classes = scandir(DIR_CORE . 'classes');
 
         $this->data['classes'] = array();

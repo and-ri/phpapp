@@ -1,6 +1,6 @@
 <?php
 
-define('SSL', false); // Set to true if you are using SSL
+define('SSL', true); // Set to true if you are using SSL
 define('DOMAIN', ''); // Set the domain
 define('DEFAULT_LANGUAGE', 'en'); // Set the default language
 define('SESSION_NAME', 'PHPAPPSESSID'); // Set the session name
