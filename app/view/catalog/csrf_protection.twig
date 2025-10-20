@@ -1,30 +1,64 @@
 {{ header }}
-<div class="container my-5">
-    <h1>{{ heading_title }}</h1>
-    <p>{{ text_help }}</p>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-4">{{ heading_title }}</h1>
+    <p class="text-lg mb-6">{{ text_help }}</p>
+    
     <form action="{{ action }}" method="post" enctype="multipart/form-data">
         {{ csrf }}
-        <fieldset>
-            <legend>{{ text_form }}</legend>
-            <div class="form-floating mb-3">
-                <input type="email" name="email" value="{{ email }}" placeholder="{{ entry_email }}" class="form-control" required id="entry-email">
-                <label for="entry-email">{{ entry_email }}</label>
+        
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">{{ text_form }}</h2>
+                
+                <div class="form-control mb-4">
+                    <label class="label" for="entry-email">
+                        <span class="label-text">{{ entry_email }}</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value="{{ email }}" 
+                        placeholder="{{ entry_email }}" 
+                        class="input input-bordered w-full" 
+                        required 
+                        id="entry-email"
+                    >
+                </div>
+                
+                <div class="form-control mb-6">
+                    <label class="label" for="entry-password">
+                        <span class="label-text">{{ entry_password }}</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        value="{{ password }}" 
+                        placeholder="{{ entry_password }}" 
+                        class="input input-bordered w-full" 
+                        required 
+                        id="entry-password"
+                    >
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-4">
+                    <button type="submit" class="btn">
+                        {{ button_submit }}
+                    </button>
+                    
+                    {% if error %}
+                    <div class="alert alert-error py-2 px-4">
+                        <span class="font-semibold">{{ error }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if success %}
+                    <div class="alert alert-success py-2 px-4">
+                        <span class="font-semibold">{{ success }}</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" class="form-control" required id="entry-password">
-                <label for="entry-password">{{ entry_password }}</label>
-            </div>
-            <div class="hstack gap-3">
-                <button type="submit" class="btn btn-warning btn-lg">{{ button_submit }}</button>
-                {% if error %}
-                <strong class="text-danger">{{ error }}</strong>
-                {% endif %}
-                {% if success %}
-                <strong class="text-success">{{ success }}</strong>
-                {% endif %}
-            </div>
-        </fieldset>
+        </div>
     </form>
-    {{ pagination }}
 </div>
 {{ footer }}

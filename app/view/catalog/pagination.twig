@@ -1,21 +1,24 @@
 {{ header }}
-<div class="container my-5">
-    <h1>{{ heading_title }}</h1>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-6">{{ heading_title }}</h1>
+    
+    <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
             <thead>
-                <tr>
-                    <td colspan="3">{{ total }}( {{ from }} - {{ to }} )</td>
+                <tr class="bg-base-200">
+                    <th colspan="3" class="text-base font-semibold">
+                        {{ total }} ({{ from }} - {{ to }})
+                    </th>
                 </tr>
                 <tr>
-                    <td class="text-center">{{ column_post_id }}</td>
-                    <td class="text-left">{{ column_hash }}</td>
-                    <td class="text-left">{{ column_created_at }}</td>
+                    <th class="text-center">{{ column_post_id }}</th>
+                    <th class="text-left">{{ column_hash }}</th>
+                    <th class="text-left">{{ column_created_at }}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for post in posts %}
-                <tr>
+                <tr class="hover">
                     <td class="text-center">{{ post.post_id }}</td>
                     <td class="text-left">{{ post.hash }}</td>
                     <td class="text-left">{{ post.created_at }}</td>
@@ -24,6 +27,9 @@
             </tbody>
         </table>
     </div>
-    {{ pagination }}
+    
+    <div class="mt-6">
+        {{ pagination }}
+    </div>
 </div>
 {{ footer }}
