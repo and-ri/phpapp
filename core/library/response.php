@@ -92,17 +92,17 @@ class Response {
             header($header);
         }
 
-        echo html_entity_decode($html, ENT_QUOTES, 'UTF-8');
+        echo $html;
     }
 
     public function json($data, $pretty = false) {
-        $this->addHeader('Content-Type: application/json');
+        $this->addHeader('Content-Type: application/json; charset=utf-8');
 
         foreach ($this->headers as $header) {
             header($header);
         }
 
-        echo json_encode($data, $pretty ? JSON_PRETTY_PRINT : 0);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE | ($pretty ? JSON_PRETTY_PRINT : 0));
     }
 
     public function redirect($url, $status = 302) {

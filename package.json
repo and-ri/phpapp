@@ -1,10 +1,10 @@
 {
     "name": "php-app",
     "version": "1.0.0",
-    "description": "**PHPapp** is a lightweight PHP framework designed for quick and efficient web application development. It follows the MVC (Model-View-Controller) architecture and provides core components for data management, routing, and user interaction.",
-    "main": "index.js",
+    "description": "Frontend build for PHPapp: Tailwind CSS 4 + daisyUI bundled with Vite into www/assets.",
+    "private": true,
     "scripts": {
-        "dev": "vite",
+        "dev": "vite build --watch",
         "build": "vite build"
     },
     "repository": {
@@ -13,19 +13,14 @@
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/and-ri/phpapp/issues"
     },
     "homepage": "https://github.com/and-ri/phpapp#readme",
     "devDependencies": {
-        "autoprefixer": "^10.4.21",
+        "@tailwindcss/vite": "^4.1.15",
         "daisyui": "^5.3.7",
-        "postcss": "^8.5.6",
-        "tailwindcss": "^4.1.15",
         "vite": "^7.1.11"
-    },
-    "dependencies": {
-        "@tailwindcss/vite": "^4.1.15"
     }
 }

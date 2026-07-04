@@ -5,10 +5,10 @@ class Env {
 
     public function __construct() {
         $this->dotenv = Dotenv\Dotenv::createImmutable(DIR_ROOT);
-        $this->dotenv->load();
+        $this->dotenv->safeLoad();
     }
 
-    public function get($key) {
-        return !empty($_ENV[$key]) ? $_ENV[$key] : null;
+    public function get($key, $default = null) {
+        return isset($_ENV[$key]) && $_ENV[$key] !== '' ? $_ENV[$key] : $default;
     }
 }

@@ -5,19 +5,23 @@ export default defineConfig({
     plugins: [
         tailwindcss(),
     ],
-    root: './',
     build: {
         outDir: './www/assets',
         emptyOutDir: true,
+        // keep CSS as a separate file (linked from header.twig)
+        cssCodeSplit: false,
         rollupOptions: {
             input: {
                 app: './static/js/app.js',
             },
             output: {
+                // iife: plain <script src> works without type="module"
+                format: 'iife',
                 entryFileNames: 'js/[name].js',
                 chunkFileNames: 'js/[name].js',
                 assetFileNames: ({ name }) => {
-                    if (name && name.endsWith('.css')) return 'css/[name][extname]';
+                    // single CSS bundle (cssCodeSplit: false) is always app.css
+                    if (name && name.endsWith('.css')) return 'css/app[extname]';
                     return '[name][extname]';
                 },
             }
@@ -25,8 +29,5 @@ export default defineConfig({
     },
     css: {
         devSourcemap: true
-    },
-    optimizeDeps: {
-    include: ['@tailwindcss/vite']
-  }
+    }
 });

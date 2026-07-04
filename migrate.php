@@ -1,6 +1,10 @@
 <?php
 
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+if (PHP_SAPI !== 'cli') {
+    exit('migrate.php can only be run from the command line.');
+}
+
+error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('max_execution_time', 0);
@@ -48,21 +52,43 @@ function migrate($db) {
     ");
 
     $appliedMigrations = array_column(
-        $db->query("SELECT migration FROM migrations", true),
+        $db->query("SELECT migration FROM migrations", true) ?: array(),
         'migration'
     );
 
-    $files = glob(__DIR__ . '/migrations/*.php');
-    foreach ($files as $file) {
+    foreach (migrationFiles() as $file) {
         $migrationName = basename($file, '.php');
         if (!in_array($migrationName, $appliedMigrations)) {
-            require_once $file;
-            $migration = new Migration();
+            $migration = loadMigration($file);
             $migration->up($db);
-            $db->query("INSERT INTO migrations (migration, applied_at) VALUES ('$migrationName', NOW())");
+            $db->query("INSERT INTO migrations (migration, applied_at) VALUES ('" . $db->escape($migrationName) . "', NOW())");
             echo "Applied: $migrationName\n";
         }
     }
+}
+
+function migrationFiles() {
+    return array_filter(glob(__DIR__ . '/migrations/*.php'), function ($file) {
+        return basename($file) !== 'template.php';
+    });
+}
+
+function loadMigration($file) {
+    $migration = require $file;
+
+    // New style: the file returns an anonymous class instance.
+    // Old style: the file defines a Migration class.
+    if (is_object($migration)) {
+        return $migration;
+    }
+
+    if (class_exists('Migration')) {
+        $class = 'Migration';
+
+        return new $class();
+    }
+
+    throw new RuntimeException("Migration file $file must return an object or define a Migration class.");
 }
 
 function rollback($db) {
@@ -71,10 +97,11 @@ function rollback($db) {
     $lastMigration = $db->query("SELECT migration FROM migrations ORDER BY id DESC LIMIT 1", true)[0]['migration'] ?? null;
 
     if ($lastMigration) {
-        require_once __DIR__ . "/migrations/$lastMigration.php";
-        $migration = new Migration();
+        $lastMigration = basename($lastMigration);
+
+        $migration = loadMigration(__DIR__ . "/migrations/$lastMigration.php");
         $migration->down($db);
-        $db->query("DELETE FROM migrations WHERE migration = '$lastMigration'");
+        $db->query("DELETE FROM migrations WHERE migration = '" . $db->escape($lastMigration) . "'");
         echo "Rolled back: $lastMigration\n";
     } else {
         echo "No migrations to roll back.\n";

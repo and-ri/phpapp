@@ -2,7 +2,6 @@
 
 class Router {
     private $registry;
-    private $path;
     private $args = array();
 
     public $file;
@@ -19,16 +18,11 @@ class Router {
     }
 
     private function getController() {
-        // Get the request URI
-        $request = html_entity_decode($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8');
-
-        // Remove query string from the request URI
-        if (strpos($request, '?') !== false) {
-            $request = substr($request, 0, strpos($request, '?'));
-        }
+        // Get the request path (without query string) and decode it
+        $request = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 
         // Split the URI into parts
-        $route_parts = array_values(array_filter(explode('/', $request)));
+        $route_parts = array_values(array_filter(explode('/', $request), 'strlen'));
 
         // Set default controller and action
         $this->file = 'index';
@@ -40,6 +34,15 @@ class Router {
             return;
         }
 
+        // Reject route parts with characters outside the allowed set
+        // (protects against path traversal like /../config/web)
+        foreach ($route_parts as $part) {
+            if (!preg_match('/^[a-zA-Z0-9_-]+$/', $part)) {
+                $this->setNotFound(implode('/', $route_parts), $this->action, 'Invalid route');
+                return;
+            }
+        }
+
         // Parse the route parts
         $current_path = '';
         $found_controller = false;
@@ -49,7 +52,7 @@ class Router {
             $current_path = trim($current_path . '/' . $part, '/');
             $controller_file = DIR_CONTROLLER . $current_path . '.php';
 
-            if (file_exists($controller_file)) {
+            if (is_file($controller_file)) {
                 $this->file = $current_path;
                 $this->controller = 'Controller' . implode('', array_map('ucfirst', explode('/', str_replace('_', '', $current_path))));
 
@@ -66,58 +69,56 @@ class Router {
 
         // If no valid controller was found, redirect to error/not_found
         if (!$found_controller) {
-            $this->args['controller'] = $current_path;
-            $this->args['action'] = $this->action;
-            $this->args['message'] = 'Controller not found';
-            $this->file = 'error/not_found';
-            $this->controller = 'ControllerErrorNotFound';
-            $this->action = 'index';
+            $this->setNotFound($current_path, $this->action, 'Controller not found');
         }
     }
 
+    private function setNotFound($controller, $action, $message) {
+        $this->args['controller'] = $controller;
+        $this->args['action'] = $action;
+        $this->args['message'] = $message;
+        $this->file = 'error/not_found';
+        $this->controller = 'ControllerErrorNotFound';
+        $this->action = 'index';
+    }
+
     private function executeController() {
-        $controller_file = DIR_CONTROLLER . $this->file . '.php';
-
-        // Check if the controller file exists
-        if (!file_exists($controller_file)) {
-            $this->args['controller'] = $this->file;
-            $this->args['action'] = $this->action;
-            $this->args['message'] = 'Controller file not found';
-            $this->file = 'error/not_found';
-            $this->controller = 'ControllerErrorNotFound';
-        } else {
-            // Include the controller file
-            require_once $controller_file;
-
-            // Check if the controller class exists
-            if (!class_exists($this->controller)) {
-                require_once DIR_CONTROLLER . 'error/not_found.php';
-
-                $this->args['controller'] = $this->file;
-                $this->args['action'] = $this->action;
-                $this->args['message'] = 'Controller class not found';
-                $this->file = 'error/not_found';
-                $this->controller = 'ControllerErrorNotFound';
-            }
+        // Fall back to the error controller if the file or class is missing
+        if (!is_file(DIR_CONTROLLER . $this->file . '.php')) {
+            $this->setNotFound($this->file, $this->action, 'Controller file not found');
         }
 
-        // Create the controller instance
+        require_once DIR_CONTROLLER . $this->file . '.php';
+
+        if (!class_exists($this->controller)) {
+            $this->setNotFound($this->file, $this->action, 'Controller class not found');
+            require_once DIR_CONTROLLER . $this->file . '.php';
+        }
+
+        // Magic and internal methods (__construct, __get, ...) are not routable
+        if (!$this->isRoutable($this->controller, $this->action)) {
+            $this->setNotFound($this->file, $this->action, 'Action method not found');
+            require_once DIR_CONTROLLER . $this->file . '.php';
+        }
+
+        // Create the controller instance and call the action method
         $controller = new $this->controller($this->registry, $this->args);
 
-        // Check if the action method exists
-        if (!method_exists($controller, $this->action)) {
-            $this->args['controller'] = $this->file;
-            $this->args['action'] = $this->action;
-            $this->args['message'] = 'Action method not found';
-            $this->file = 'error/not_found';
-            require_once DIR_CONTROLLER . 'error/not_found.php';
-            $this->controller = 'ControllerErrorNotFound';
-            $controller = new $this->controller($this->registry, $this->args);
-            $this->action = 'index';
-        }
-
-        // Call the action method
         $action = $this->action;
         $controller->$action();
+    }
+
+    private function isRoutable($class, $action) {
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $action)) {
+            return false;
+        }
+
+        if (!method_exists($class, $action)) {
+            return false;
+        }
+
+        $method = new ReflectionMethod($class, $action);
+
+        return $method->isPublic() && !$method->isStatic() && !$method->isConstructor() && !$method->isDestructor();
     }
 }

@@ -2,7 +2,7 @@
 
 class Load {
     protected $registry;
-    
+
     public function __construct($registry) {
         $this->registry = $registry;
     }
@@ -16,9 +16,11 @@ class Load {
     }
 
     public function controller($route, $data = array()) {
+        $route = $this->validateRoute($route);
+
         $output = '';
 
-        $file = DIR_CONTROLLER . str_replace(array('../', '..\\', '..'), '', $route) . '.php';
+        $file = DIR_CONTROLLER . $route . '.php';
         $class = 'Controller' . preg_replace('/[^a-zA-Z0-9]/', '', $route);
 
         if (is_file($file)) {
@@ -31,22 +33,33 @@ class Load {
             }
         }
 
-        return $output;
+        // Sub-controller output is trusted HTML: keep it unescaped
+        // when passed into an autoescaped Twig template
+        return new \Twig\Markup((string)$output, 'UTF-8');
     }
 
     public function model($route) {
-        $file = DIR_MODEL . str_replace(array('../', '..\\', '..'), '', $route) . '.php';
+        $route = $this->validateRoute($route);
+
+        $file = DIR_MODEL . $route . '.php';
         $class = 'Model' . preg_replace('/[^a-zA-Z0-9]/', '', $route);
 
         if (is_file($file)) {
             include_once($file);
 
-            $model = new $class($this->registry);
-
-            return $model;
-        } else {
-            trigger_error('Error: Could not load model ' . $route . '!');
-            exit();
+            return new $class($this->registry);
         }
+
+        throw new RuntimeException('Error: Could not load model ' . $route . '!');
+    }
+
+    protected function validateRoute($route) {
+        $route = (string)$route;
+
+        if (!preg_match('/^[a-zA-Z0-9_\/-]+$/', $route) || strpos($route, '..') !== false) {
+            throw new InvalidArgumentException('Error: Invalid route ' . $route . '!');
+        }
+
+        return $route;
     }
 }

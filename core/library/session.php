@@ -13,8 +13,8 @@ class Session {
     }
 
     public function start() {
-        if (isset($this->request->cookie[SESSION_NAME]) && $this->request->cookie[SESSION_NAME] && $this->request->cookie[SESSION_NAME] != session_id() && file_exists(DIR_SESSION . '/sess_' . $this->request->cookie[SESSION_NAME])) {
-            session_id($this->request->cookie[SESSION_NAME]);
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
         }
 
         ini_set('session.use_only_cookies', 1);
@@ -23,34 +23,44 @@ class Session {
         ini_set('session.save_path', DIR_SESSION);
 
         if (!is_dir(DIR_SESSION)) {
-            mkdir(DIR_SESSION, 0777);
+            mkdir(DIR_SESSION, 0700, true);
         }
 
         session_name(SESSION_NAME);
 
-        session_set_cookie_params(0, '/');
-
         session_start([
             'cookie_lifetime' => 86400,
+            'cookie_path' => '/',
             'cookie_httponly' => true,
+            'cookie_secure' => defined('SSL') && SSL,
             'cookie_samesite' => 'Strict',
             'use_strict_mode' => true,
             'sid_length' => 64,
             'sid_bits_per_character' => 6
         ]);
 
-        setcookie(SESSION_NAME, session_id(), 0, '/');
-
         if (!$this->has('token')) {
             $this->refreshToken();
+        }
+    }
+
+    public function regenerate() {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
         }
     }
 
     public function destroy() {
         if (session_id()) {
             session_destroy();
-            
-            setcookie(SESSION_NAME, '', time() - 42000, '/');
+
+            setcookie(SESSION_NAME, '', [
+                'expires' => time() - 42000,
+                'path' => '/',
+                'httponly' => true,
+                'secure' => defined('SSL') && SSL,
+                'samesite' => 'Strict'
+            ]);
         }
     }
 
@@ -77,11 +87,11 @@ class Session {
     }
 
     public function refreshToken() {
-        $this->set('token', md5(uniqid(mt_rand(), true)));
+        $this->set('token', bin2hex(random_bytes(32)));
     }
 
     public function validateToken($token) {
-        return $this->has('token') && $this->get('token') && $this->get('token') == $token;
+        return is_string($token) && $this->has('token') && hash_equals((string)$this->get('token'), $token);
     }
 
     public function __destruct() {

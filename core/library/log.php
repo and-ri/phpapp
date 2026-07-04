@@ -7,14 +7,13 @@ class Log {
     private $logger;
 
     public function __construct($channelName = 'phpapp', $logFile = 'app.log') {
+        if (!is_dir(DIR_LOG)) {
+            mkdir(DIR_LOG, 0755, true);
+        }
+
         $this->logger = new Logger($channelName);
 
         $this->logger->pushHandler(new StreamHandler(DIR_LOG . $logFile, Logger::DEBUG));
-
-        $logDir = DIR_LOG;
-        if (!is_dir($logDir)) {
-            mkdir($logDir, 0777, true);
-        }
     }
 
     public function info($message, array $context = []) {

@@ -18,6 +18,10 @@ class google_auth {
     }
 
     public function init() {
+        if ($this->client) {
+            return;
+        }
+
         $this->client = new GoogleClient();
         $this->client->setClientId($this->env->get('GOOGLE_AUTH_CLIENT_ID'));
         $this->client->setClientSecret($this->env->get('GOOGLE_AUTH_CLIENT_SECRET'));
@@ -27,20 +31,29 @@ class google_auth {
     }
 
     public function getAuthUrl() {
+        $this->init();
+
         return $this->client->createAuthUrl();
     }
 
     public function authenticate($code) {
+        $this->init();
+
         $this->client->authenticate($code);
-        $_SESSION['access_token'] = $this->client->getAccessToken();
+        $this->session->set('access_token', $this->client->getAccessToken());
+
+        // A fresh session id after login prevents session fixation
+        $this->session->regenerate();
     }
 
     public function getUserInfo() {
-        if (!isset($_SESSION['access_token'])) {
+        if (!$this->session->has('access_token')) {
             throw new Exception('User not authenticated');
         }
 
-        $this->client->setAccessToken($_SESSION['access_token']);
+        $this->init();
+
+        $this->client->setAccessToken($this->session->get('access_token'));
         $oauth2 = new \Google_Service_Oauth2($this->client);
         return $oauth2->userinfo->get();
     }

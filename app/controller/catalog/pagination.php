@@ -8,7 +8,7 @@ class ControllerCatalogPagination extends Controller {
         $this->meta->setTitle($this->language->get('meta_title'));
         $this->meta->setDescription($this->language->get('meta_description'));
 
-        $page = isset($this->request->get['page']) ? $this->request->get['page'] : 1;
+        $page = isset($this->request->get['page']) ? max(1, (int)$this->request->get['page']) : 1;
 
         $this->data['heading_title'] = $page > 1 ? $this->language->get('heading_title') . ' - ' . $page : $this->language->get('heading_title');
 

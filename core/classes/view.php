@@ -3,7 +3,7 @@
 class View {
     protected $registry;
     protected $twig;
-    
+
     public function __construct($registry) {
         $this->registry = $registry;
 
@@ -12,8 +12,8 @@ class View {
         $this->twig = new \Twig\Environment($loader, [
             'cache' => DIR_CACHE . 'twig',
             'auto_reload' => true,
-            'debug' => true,
-            'autoescape' => false
+            'debug' => false,
+            'autoescape' => 'html'
         ]);
     }
 
@@ -25,7 +25,17 @@ class View {
         return $template->render($data);
     }
 
+    /**
+     * Wrap a trusted HTML string so autoescaping does not escape it,
+     * e.g. $this->data['header'] = $this->view->raw($html);
+     */
+    public function raw($html) {
+        return new \Twig\Markup((string)$html, 'UTF-8');
+    }
+
     protected function filter(&$data) {
-        $data['csrf'] = '<input type="hidden" name="csrf" value="' . $this->registry->get('session')->get('token') . '" />';
+        $token = htmlspecialchars((string)$this->registry->get('session')->get('token'), ENT_QUOTES, 'UTF-8');
+
+        $data['csrf'] = $this->raw('<input type="hidden" name="csrf" value="' . $token . '" />');
     }
 }
