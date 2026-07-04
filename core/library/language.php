@@ -7,7 +7,8 @@ class Language {
     public function __construct($lang) {
         $this->lang = $lang;
 
-        $this->load(DEFAULT_LANGUAGE);
+        // The base language file is named after the language code, e.g. en/en.php
+        $this->load($this->lang);
     }
 
     public function get($key) {
@@ -15,15 +16,20 @@ class Language {
     }
 
     public function load($file) {
-        $file = DIR_LANGUAGE . $this->lang . '/' . $file . '.php';
+        if (!preg_match('/^[a-zA-Z0-9_\/-]+$/', (string)$file) || strpos($file, '..') !== false) {
+            throw new InvalidArgumentException('Error: Invalid language route ' . $file . '!');
+        }
 
-        if (file_exists($file)) {
-            $data = include $file;
+        $path = DIR_LANGUAGE . $this->lang . '/' . $file . '.php';
 
-            $this->data = array_merge($this->data, $data);
+        if (is_file($path)) {
+            $data = include $path;
+
+            if (is_array($data)) {
+                $this->data = array_merge($this->data, $data);
+            }
         } else {
-            trigger_error('Error: Could not load language ' . $file . '!');
-            exit();
+            trigger_error('Error: Could not load language ' . $path . '!', E_USER_WARNING);
         }
 
         return $this;

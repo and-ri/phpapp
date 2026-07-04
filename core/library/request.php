@@ -8,42 +8,29 @@ class Request {
     public $cookie;
 
     public function __construct() {
-        $this->setGet();
-        $this->setPost();
-        $this->setFiles();
-        $this->setServer();
-        $this->setCookie();
-    }
-
-    private function setGet() {
-        $this->get = $this->sanitize($_GET);
-    }
-
-    private function setPost() {
-        $this->post = $this->sanitize($_POST);
-    }
-
-    private function setFiles() {
+        // Input is kept raw; escaping happens at the output layer
+        // (Twig autoescape for HTML, Db::escape/execute for SQL)
+        $this->get = $this->clean($_GET);
+        $this->post = $this->clean($_POST);
         $this->files = $_FILES;
+        $this->server = $this->clean($_SERVER);
+        $this->cookie = $this->clean($_COOKIE);
     }
 
-    private function setServer() {
-        $this->server = $this->sanitize($_SERVER);
-    }
-
-    private function setCookie() {
-        $this->cookie = $this->sanitize($_COOKIE);
-    }
-    
-    private function sanitize($data) {
+    private function clean($data) {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = $this->sanitize($value);
+                $data[$key] = $this->clean($value);
             }
         } else {
-            $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+            // Strip null bytes and invalid UTF-8 sequences
+            $data = str_replace("\0", '', (string)$data);
+
+            if (!mb_check_encoding($data, 'UTF-8')) {
+                $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            }
         }
-        
+
         return $data;
     }
 }

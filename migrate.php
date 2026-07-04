@@ -1,6 +1,10 @@
 <?php
 
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+if (PHP_SAPI !== 'cli') {
+    exit('migrate.php can only be run from the command line.');
+}
+
+error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('max_execution_time', 0);
@@ -48,7 +52,7 @@ function migrate($db) {
     ");
 
     $appliedMigrations = array_column(
-        $db->query("SELECT migration FROM migrations", true),
+        $db->query("SELECT migration FROM migrations", true) ?: array(),
         'migration'
     );
 
@@ -59,7 +63,7 @@ function migrate($db) {
             require_once $file;
             $migration = new Migration();
             $migration->up($db);
-            $db->query("INSERT INTO migrations (migration, applied_at) VALUES ('$migrationName', NOW())");
+            $db->query("INSERT INTO migrations (migration, applied_at) VALUES ('" . $db->escape($migrationName) . "', NOW())");
             echo "Applied: $migrationName\n";
         }
     }
@@ -71,10 +75,12 @@ function rollback($db) {
     $lastMigration = $db->query("SELECT migration FROM migrations ORDER BY id DESC LIMIT 1", true)[0]['migration'] ?? null;
 
     if ($lastMigration) {
+        $lastMigration = basename($lastMigration);
+
         require_once __DIR__ . "/migrations/$lastMigration.php";
         $migration = new Migration();
         $migration->down($db);
-        $db->query("DELETE FROM migrations WHERE migration = '$lastMigration'");
+        $db->query("DELETE FROM migrations WHERE migration = '" . $db->escape($lastMigration) . "'");
         echo "Rolled back: $lastMigration\n";
     } else {
         echo "No migrations to roll back.\n";

@@ -2,7 +2,7 @@
 
 class ControllerCommonHeader extends Controller {
     public function index() {
-        $this->data['meta'] = $this->meta->getMetaTags();
+        $this->data['meta'] = $this->view->raw($this->meta->getMetaTags());
 
         $this->data['styles'] = $this->response->getStyles();
 
