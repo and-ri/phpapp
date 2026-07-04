@@ -38,6 +38,24 @@ class StaticFile {
         return URL_STATIC . $file . '?last_modified=' . $last_modified;
     }
 
+    /**
+     * URI for a Vite-built asset in www/assets/ with a cache-busting
+     * version parameter, e.g. getAssetUri('css/app.css')
+     */
+    public function getAssetUri($file) {
+        $file = $this->sanitize($file);
+
+        $path = DIR_WWW . 'assets/' . $file;
+
+        $uri = '/assets/' . $file;
+
+        if (is_file($path)) {
+            $uri .= '?v=' . filemtime($path);
+        }
+
+        return $uri;
+    }
+
     protected function sanitize($file) {
         return str_replace(array('..', "\0"), '', (string)$file);
     }

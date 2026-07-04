@@ -6,7 +6,7 @@ class ControllerCommonHeader extends Controller {
 
         $this->data['styles'] = $this->response->getStyles();
 
-        $this->response->addScript('/assets/js/app.js');
+        $this->response->addScript($this->staticfile->getAssetUri('js/app.js'));
         
         $scripts = $this->response->getScripts();
 
@@ -20,7 +20,7 @@ class ControllerCommonHeader extends Controller {
 
         $this->data['menu'] = $this->load->controller('common/menu');
 
-        $this->response->addStyle('/assets/css/app.css');
+        $this->response->addStyle($this->staticfile->getAssetUri('css/app.css'));
 
         $this->data['styles'] = $this->response->getStyles();
 
