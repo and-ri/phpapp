@@ -2,7 +2,7 @@ name: PHP CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
     branches: [ main ]
 
@@ -26,7 +26,7 @@ jobs:
           --health-retries=3
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -43,59 +43,53 @@ jobs:
           display_startup_errors=On
           error_reporting=E_ALL
 
-    - name: Check PHP installation
-      run: |
-        php -v
-        php -m
-        php --ini
-
     - name: Validate composer.json
       run: composer validate --strict
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
+    - name: Lint PHP files
+      run: |
+        find . \
+          -path ./core/vendor -prune -o \
+          -path ./node_modules -prune -o \
+          -name '*.php' -print0 \
+          | xargs -0 -n1 -P4 php -l > /dev/null
+        echo "All PHP files lint clean"
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+
+    - name: Build frontend assets
+      run: |
+        npm ci
+        npm run build
+
     - name: Create .env file
       run: |
         cp .env.example .env
-        sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
-        sed -i 's/^DB_DATABASE=.*/DB_DATABASE=phpapp/' .env
-        sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
-        sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+        sed -i 's/^DB_HOST=.*/DB_HOST="127.0.0.1"/' .env
+        sed -i 's/^DB_NAME=.*/DB_NAME="phpapp"/' .env
+        sed -i 's/^DB_USER=.*/DB_USER="root"/' .env
+        sed -i 's/^DB_PASS=.*/DB_PASS="root"/' .env
+        cat .env
 
-    - name: Verify project structure
+    - name: Run migrations
       run: |
-        echo "Current directory structure:"
-        ls -la
-        if [ -d "public" ]; then
-          echo "Contents of public directory:"
-          ls -la public
-        else
-          echo "public directory not found!"
-          echo "Contents of root directory:"
-          ls -la
-        fi
+        php migrate.php migrate
+        php migrate.php status
 
     - name: Start PHP server
       run: |
-        # Determine the correct document root
-        if [ -d "public" ]; then
-          DOCROOT="public"
-        elif [ -d "www" ]; then
-          DOCROOT="www"
-        else
-          DOCROOT="."
-        fi
-        echo "Using document root: $DOCROOT"
-        
-        # Start PHP server with error logging
-        php -S 127.0.0.1:8000 -t $DOCROOT > php-server.log 2>&1 &
+        php -S 127.0.0.1:8000 -t www > php-server.log 2>&1 &
         echo $! > php-server.pid
-        
-        # Give it a moment to start
+
         sleep 2
-        
-        # Check if process is running
+
         if ps -p $(cat php-server.pid) > /dev/null; then
           echo "PHP server process is running"
         else
@@ -104,31 +98,52 @@ jobs:
           exit 1
         fi
 
-    - name: Wait for server and check health
+    - name: Wait for server
       run: |
         max_attempts=30
         attempt=1
-        
+
         while [ $attempt -le $max_attempts ]; do
-          echo "Attempt $attempt of $max_attempts"
-          
           if curl -s -f http://127.0.0.1:8000 > /dev/null 2>&1; then
             echo "Server is responding!"
             exit 0
           fi
-          
-          # Check if server is still running
+
           if ! ps -p $(cat php-server.pid) > /dev/null; then
             echo "PHP server has died. Server log:"
             cat php-server.log
             exit 1
           fi
-          
+
           sleep 1
           attempt=$((attempt + 1))
         done
-        
+
         echo "Server failed to respond after $max_attempts attempts"
-        echo "PHP Server log:"
         cat php-server.log
         exit 1
+
+    - name: Smoke test pages
+      run: |
+        check() {
+          url="$1"
+          expected="$2"
+          code=$(curl -s --path-as-is -o /dev/null -w '%{http_code}' "http://127.0.0.1:8000$url")
+          if [ "$code" != "$expected" ]; then
+            echo "FAIL: $url returned $code, expected $expected"
+            cat php-server.log
+            exit 1
+          fi
+          echo "OK: $url -> $code"
+        }
+
+        check "/" 200
+        check "/catalog/csrf_protection" 200
+        check "/catalog/pagination" 200
+        check "/this-page-does-not-exist" 404
+        check "/../config/web" 404
+        check "/index/__get" 404
+
+    - name: Show server log
+      if: failure()
+      run: cat php-server.log || true

@@ -56,17 +56,39 @@ function migrate($db) {
         'migration'
     );
 
-    $files = glob(__DIR__ . '/migrations/*.php');
-    foreach ($files as $file) {
+    foreach (migrationFiles() as $file) {
         $migrationName = basename($file, '.php');
         if (!in_array($migrationName, $appliedMigrations)) {
-            require_once $file;
-            $migration = new Migration();
+            $migration = loadMigration($file);
             $migration->up($db);
             $db->query("INSERT INTO migrations (migration, applied_at) VALUES ('" . $db->escape($migrationName) . "', NOW())");
             echo "Applied: $migrationName\n";
         }
     }
+}
+
+function migrationFiles() {
+    return array_filter(glob(__DIR__ . '/migrations/*.php'), function ($file) {
+        return basename($file) !== 'template.php';
+    });
+}
+
+function loadMigration($file) {
+    $migration = require $file;
+
+    // New style: the file returns an anonymous class instance.
+    // Old style: the file defines a Migration class.
+    if (is_object($migration)) {
+        return $migration;
+    }
+
+    if (class_exists('Migration')) {
+        $class = 'Migration';
+
+        return new $class();
+    }
+
+    throw new RuntimeException("Migration file $file must return an object or define a Migration class.");
 }
 
 function rollback($db) {
@@ -77,8 +99,7 @@ function rollback($db) {
     if ($lastMigration) {
         $lastMigration = basename($lastMigration);
 
-        require_once __DIR__ . "/migrations/$lastMigration.php";
-        $migration = new Migration();
+        $migration = loadMigration(__DIR__ . "/migrations/$lastMigration.php");
         $migration->down($db);
         $db->query("DELETE FROM migrations WHERE migration = '" . $db->escape($lastMigration) . "'");
         echo "Rolled back: $lastMigration\n";
