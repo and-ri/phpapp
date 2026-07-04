@@ -12,11 +12,15 @@ class ControllerCatalogCsrfProtection extends Controller {
         $this->data['action'] = $this->url->link('catalog/csrf_protection');
 
         if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
-            $this->data['success'] = $this->language->get('text_success');
-        } else {
-            $this->data['error'] = isset($this->error['csrf_token']) ? $this->error['csrf_token'] : '';
-            $this->data['email'] = isset($this->request->post['email']) ? $this->request->post['email'] : '';
+            // POST -> redirect -> GET: the message survives the redirect in a flash
+            $this->flash->set('success', $this->language->get('text_success'));
+
+            $this->response->redirect($this->data['action']);
         }
+
+        $this->data['success'] = $this->flash->get('success');
+        $this->data['error'] = implode(' ', $this->error);
+        $this->data['email'] = isset($this->request->post['email']) ? $this->request->post['email'] : '';
 
         $this->data['header'] = $this->load->controller('common/header');
         $this->data['footer'] = $this->load->controller('common/footer');
@@ -27,6 +31,13 @@ class ControllerCatalogCsrfProtection extends Controller {
     protected function validate() {
         if (!isset($this->request->post['csrf']) || !$this->session->validateToken($this->request->post['csrf'])) {
             $this->error['csrf_token'] = $this->language->get('error_csrf_token');
+        }
+
+        if (!$this->validator->validate($this->request->post, array(
+            'email' => 'required|email',
+            'password' => 'required|min:8'
+        ))) {
+            $this->error = array_merge($this->error, $this->validator->errors());
         }
 
         return !$this->error;

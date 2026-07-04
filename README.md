@@ -82,15 +82,19 @@ Templates reference the built assets through `$this->staticfile->getAssetUri('cs
 - **cache.php**: Simple file-based cache with optional TTL (`get`, `set`, `delete`, `deleteAll`).
 - **db.php**: Provides methods for database queries and connection handling, including prepared statements via `execute()`.
 - **env.php**: Handles environment variables and configuration settings.
+- **flash.php**: One-time session messages for the POST -> redirect -> GET pattern.
 - **google_auth.php**: Handles the Google authentication process for the application.
 - **language.php**: Loads and manages language files for multi-language support.
 - **load.php**: Loads models and controllers dynamically.
+- **mail.php**: Sends email via SMTP or PHP `mail()` using PHPMailer (configured through `.env`).
 - **pagination.php**: Provides simple pagination functionality.
 - **request.php**: Handles incoming HTTP requests.
 - **response.php**: Manages HTTP responses and headers.
 - **session.php**: Facilitates session management (start, get, set, remove, etc.) and CSRF tokens.
 - **staticfile.php**: Serves static files (CSS, JS, images) and generates cache-busted URIs for built assets.
+- **upload.php**: Stores uploaded files safely (finfo MIME check, extension allowlist, random names).
 - **url.php**: Generates URLs and manages routing.
+- **validator.php**: Rule-based input validation (`required|email|min:8|...`) with per-field error messages.
 - **log.php**: Provides centralized logging functionality using Monolog.
 - **meta.php**: Manages SEO metadata including page titles, descriptions, Open Graph tags, and robots directives using the Melbahja/Seo package.
 
