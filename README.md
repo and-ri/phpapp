@@ -79,6 +79,7 @@ Templates reference the built assets through `$this->staticfile->getAssetUri('cs
 ### Libraries
 
 - **app.php**: Manages the application lifecycle, including initialization and configuration.
+- **auth.php**: Authentication service — local and OAuth login, registration, "remember me", and user meta (backed by the `user` / `user_auth` / `user_meta` tables).
 - **cache.php**: Simple file-based cache with optional TTL (`get`, `set`, `delete`, `deleteAll`).
 - **db.php**: Provides methods for database queries and connection handling, including prepared statements via `execute()`.
 - **env.php**: Handles environment variables and configuration settings.
@@ -97,6 +98,62 @@ Templates reference the built assets through `$this->staticfile->getAssetUri('cs
 - **validator.php**: Rule-based input validation (`required|email|min:8|...`) with per-field error messages.
 - **log.php**: Provides centralized logging functionality using Monolog.
 - **meta.php**: Manages SEO metadata including page titles, descriptions, Open Graph tags, and robots directives using the Melbahja/Seo package.
+
+## Authentication
+
+Run the migrations to create the `user`, `user_auth`, and `user_meta` tables, then use the `auth` service. The user table is deliberately lean and provider-agnostic (nullable `email`, `username`, and `password`), so local, username-only, and OAuth-only accounts all share it. Application-specific fields live in `user_meta` as key/value pairs, so you never have to alter the core table.
+
+### Local accounts
+
+```php
+// Registration
+$user = $this->auth->register([
+    'email'    => $this->request->post['email'],
+    'password' => $this->request->post['password'],
+    'status'   => Auth::STATUS_ACTIVE,
+]);
+
+// Login (by email or username). Third argument enables "remember me".
+if ($this->auth->attempt($identifier, $password, $remember = true)) {
+    $this->response->redirect($this->url->link('account/dashboard'));
+}
+
+// Anywhere afterwards
+if ($this->auth->check()) {
+    $id   = $this->auth->id();
+    $user = $this->auth->user();   // core row, resolved once per request
+}
+
+$this->auth->logout();
+```
+
+Passwords are hashed with `PASSWORD_DEFAULT` and transparently re-hashed on login when the algorithm or cost changes. `attempt()` verifies credentials only — check `status` yourself if you want to block pending or banned users. Throttle login attempts with the `cache` library (TTL-based) to slow down brute force.
+
+### OAuth accounts
+
+`google_auth` remains the OAuth transport; hand the provider identity to `auth` to resolve or create the account:
+
+```php
+$this->google_auth->authenticate($code);
+$info = $this->google_auth->getUserInfo();
+
+$user = $this->auth->findOrCreateFromProvider('google', $info->id, [
+    'email'    => $info->email,
+    'username' => $info->name,
+]);
+
+$this->auth->login($user);
+```
+
+An existing account with the same email is linked to the new provider instead of duplicated.
+
+### User meta
+
+```php
+$this->auth->setMeta($userId, 'phone', '+380...');
+$phone = $this->auth->getMeta($userId, 'phone', $default = '');
+$all   = $this->auth->allMeta($userId);   // ['phone' => '+380...', ...]
+```
 
 ## Migrations
 

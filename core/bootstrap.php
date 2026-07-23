@@ -51,6 +51,7 @@ $registry->set('validator', new Validator($registry));
 $registry->set('flash', new Flash($registry));
 $registry->set('upload', new Upload());
 $registry->set('mail', new Mail($registry));
+$registry->set('auth', new Auth($registry));
 
 $registry->set('view', new View($registry));
 
